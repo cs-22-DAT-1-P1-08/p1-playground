@@ -1,0 +1,7 @@
+[requires]
+pdcurses/3.9
+json-c/0.16
+
+[generators]
+CMakeDeps
+CMakeToolchain
