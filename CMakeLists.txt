@@ -6,5 +6,4 @@ set(CMAKE_C_STANDARD 99)
 find_package(json-c)
 find_package(pdcurses)
 
-add_subdirectory(prototypes)
-add_subdirectory(main)
+add_subdirectory(src)
