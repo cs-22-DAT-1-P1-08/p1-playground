@@ -41,7 +41,7 @@ Step-by-step guide to building on Windows with a pre-existing CLion setup.
     [options]
     [env]
    ```
- - Open project in CLion
+ - Open this project in CLion
    - Click the `Terminal` button (in bottom menu)
    - Execute the following commands
      ```

@@ -3,4 +3,5 @@ pdcurses/3.9
 json-c/0.16
 
 [generators]
-cmake
+cmake_find_package
+cmake_paths
