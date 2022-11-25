@@ -15,8 +15,8 @@ Step-by-step guide to building on Windows with a pre-existing CLion setup.
   - Find CLion installation folder, e.g.: `C:\Program Files\JetBrains\CLion 2022.2.3`
   - Edit the following lines and add to path:
     ```
-    <CLION_INSTALLATION_FOLDER>/bin/mingw/bin
-    <CLION_INSTALLATION_FOLDER>/bin/cmake/bin/win
+    <CLION_INSTALLATION_FOLDER>\bin\mingw\bin
+    <CLION_INSTALLATION_FOLDER>\bin\cmake\bin\win
     ```
 - Before continuing, open a new terminal and check that the following commands execute properly:
   ```
@@ -42,7 +42,7 @@ Step-by-step guide to building on Windows with a pre-existing CLion setup.
     [env]
    ```
  - Open project in CLion
-   - Click the `Terminal` button (in footer menu)
+   - Click the `Terminal` button (in bottom menu)
    - Execute the following commands
      ```
      cd .\cmake-build-debug\
