@@ -16,7 +16,7 @@ Step-by-step guide to building on Windows with a pre-existing CLion setup.
   - Edit the following lines and add to path:
     ```
     <CLION_INSTALLATION_FOLDER>\bin\mingw\bin
-    <CLION_INSTALLATION_FOLDER>\bin\cmake\bin\win
+    <CLION_INSTALLATION_FOLDER>\bin\cmake\win\bin
     ```
 - Before continuing, open a new terminal and check that the following commands execute properly:
   ```
