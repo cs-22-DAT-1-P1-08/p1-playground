@@ -21,8 +21,6 @@ char* get_active_catalog_id(char *dealer_id) {
 
     // TODO: API & JSON error handling
     char *response = curlext_easy_fetch(url, "https");
-
-    /* Create JSON object */
     json_object *j_root = json_tokener_parse(response);
     free(response);
 
