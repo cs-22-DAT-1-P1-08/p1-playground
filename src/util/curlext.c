@@ -4,20 +4,20 @@
 static size_t WriteMemoryCallback(void *contents, size_t size, size_t nmemb, void *userp);
 
 char* curlext_easy_fetch(char* url, char* protocol) {
-    CURL *curl_handle;
+    curl_global_init(CURL_GLOBAL_ALL);
+    CURL *curl_handle = curl_easy_init();
     CURLcode res;
 
     MemoryStruct chunk;
     chunk.memory = malloc(1);  /* will be grown as needed by the realloc above */
     chunk.size = 0;    /* no data at this point */
 
-    curl_global_init(CURL_GLOBAL_ALL);
-    curl_handle = curl_easy_init();
 
     if (!curl_handle) {
         fprintf(stderr,"[-] Failed Initializing Curl\n");
         exit(-1);
     }
+
     curl_easy_setopt(curl_handle, CURLOPT_CUSTOMREQUEST, "GET");
     curl_easy_setopt(curl_handle, CURLOPT_URL, url);
     curl_easy_setopt(curl_handle, CURLOPT_DEFAULT_PROTOCOL, protocol);
