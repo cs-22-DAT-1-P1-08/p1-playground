@@ -3,9 +3,6 @@ project(p1_playground C)
 
 set(CMAKE_C_STANDARD 99)
 
-include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
-conan_basic_setup()
-
 include(${CMAKE_BINARY_DIR}/conan_paths.cmake)
 
 find_package(json-c)
