@@ -4,6 +4,7 @@
 #include <time.h>
 
 #define TJEK_API_BASE_URL "https://squid-api.tjek.com/v2/"
+#define TJEK_API_V4_BASE_URL "https://squid-api.tjek.com/v4/"
 
 /**
  * Converts ISO8601 string to time_t object, assuming time string is UTC +0.

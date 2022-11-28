@@ -9,5 +9,6 @@ typedef struct {
 } MemoryStruct;
 
 char* curlext_easy_fetch(char* url, char* protocol);
+char* curlext_easy_pfetch(char* url, char* protocol, char* post_fields, struct curl_slist *headers);
 
 #endif
