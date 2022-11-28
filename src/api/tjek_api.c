@@ -32,7 +32,7 @@ catalog_offers_t* get_catalog_offers(catalog_info_t *catalog_info) {
         strcat(url, "&limit=24");
 
         char *response = curlext_easy_fetch(url, "https");
-        
+
         json_object *j_root = json_tokener_parse(response);
         free(response);
 
@@ -59,9 +59,7 @@ catalog_offers_t* get_catalog_offers(catalog_info_t *catalog_info) {
 
             group->price = json_object_get_double(j_price);
             group->offers = calloc(1, sizeof(dlist_t));
-
             dlist_add(result->offer_groups, group);
-            printf("%s kr: %s\n", json_object_get_string(j_price), json_object_get_string(j_heading));
         }
     }
 
@@ -79,7 +77,6 @@ void rec_child_views(json_object *j_view, catalog_offers_t *catalog_offers) {
         rec_child_views(j_child_view, catalog_offers);
 
         json_object *j_child_role = json_object_object_get(j_child_view, "role");
-
         if (json_object_get_type(j_child_role) != json_type_string || strcmp(json_object_get_string(j_child_role), "offer") != 0)
             continue;
 
@@ -103,13 +100,13 @@ void rec_child_views(json_object *j_view, catalog_offers_t *catalog_offers) {
             strcpy(offer->title, json_object_get_string(j_title));
 
             json_object *j_group_id = json_object_object_get(j_child_view, "id");
-            const char *group_id = json_object_get_string(j_group_id);
+            char *group_id = json_object_get_string(j_group_id);
 
             dlist_node_t *group_node = catalog_offers->offer_groups->head;
             while (group_node != NULL) {
-                offer_group_t *group = (offer_group_t*)group_node;
+                offer_group_t *group = (offer_group_t*)group_node->data;
 
-                if (strcmp(group->id, group_id) != 0) {
+                if (group->id == NULL || strcmp(group->id, group_id) != 0) {
                     group_node = group_node->next;
                     continue;
                 }
@@ -121,11 +118,6 @@ void rec_child_views(json_object *j_view, catalog_offers_t *catalog_offers) {
             }
 
             dlist_add(catalog_offers->offers, offer);
-
-            printf("%s = %s\n",
-                   json_object_get_string(json_object_object_get(j_product, "id")),
-                   json_object_get_string(json_object_object_get(j_product, "title"))
-            );
         }
     }
 }
@@ -170,6 +162,8 @@ catalog_offers_t* get_catalog_products(catalog_info_t *catalog_info, catalog_off
     json_object *j_root_view_children = json_object_object_get(j_root_view, "child_views");
 
     rec_child_views(j_root_view, catalog_offers);
+
+    return catalog_offers;
 }
 
 
@@ -232,6 +226,64 @@ catalog_info_t* get_catalog_info(char *dealer_id) {
 void free_catalog_info(catalog_info_t *info) {
     free(info->id);
     free(info);
+}
+
+void free_offer(offer_t *offer) {
+    if (offer == NULL)
+        return;
+
+    free(offer->ean);
+    free(offer->title);
+    if (offer->group != NULL)
+        free_offer_group(offer->group);
+    free(offer);
+}
+
+void free_offer_group(offer_group_t *offer_group) {
+    if (offer_group == NULL)
+        return;
+
+    dlist_free(offer_group->offers);
+    free(offer_group->id);
+    free(offer_group->heading);
+    free(offer_group);
+}
+
+// i am too tired to do this properly
+// TODO: maybe avoid exit code 0xC0000005 (Access violation error)
+void free_catalog_offers(catalog_offers_t *catalog_offers) {
+    if (catalog_offers == NULL)
+        return;
+
+    dlist_t *offer_groups = catalog_offers->offer_groups;
+    if (offer_groups != NULL) {
+        dlist_node_t *group_node = offer_groups->head;
+        while (group_node != NULL) {
+            if (group_node->data == NULL)
+                continue;
+
+            dlist_node_t *next = group_node->next;
+            free_offer_group((offer_group_t*)group_node->data);
+            group_node = next;
+        }
+        dlist_free(offer_groups);
+    }
+
+    dlist_t *offers = catalog_offers->offers;
+    if (offers != NULL) {
+        dlist_node_t *offer_node = offers->head;
+        while (offer_node != NULL) {
+            if (offer_node->data == NULL)
+                continue;
+
+            dlist_node_t *next = offer_node->next;
+            free_offer((offer_t*)offer_node->data);
+            offer_node = next;
+        }
+        dlist_free(offers);
+    }
+
+    free(catalog_offers);
 }
 
 time_t parse_iso8601_string(const char *time_str) {

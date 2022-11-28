@@ -33,8 +33,9 @@ char* curlext_easy_fetch(char* url, char* protocol) {
         fprintf(stderr,"[-] Could not fetch webpage\n[+] Error : %s\n", curl_easy_strerror(res));
         exit(-2);
     }
-    char *str_dest = malloc(sizeof(char) * chunk.size);
+    char *str_dest = malloc(sizeof(char) * chunk.size + 1);
     strcpy(str_dest, (char *)chunk.memory);
+    str_dest[sizeof(char) * chunk.size] = 0;
 
     /* cleanup curl stuff */
     curl_easy_cleanup(curl_handle);
@@ -77,8 +78,9 @@ char* curlext_easy_pfetch(char* url, char* protocol, char* post_fields, struct c
         fprintf(stderr,"[-] Could not fetch webpage\n[+] Error : %s\n", curl_easy_strerror(res));
         exit(-2);
     }
-    char *str_dest = malloc(sizeof(char) * chunk.size);
+    char *str_dest = malloc(sizeof(char) * chunk.size + 1);
     strcpy(str_dest, (char *)chunk.memory);
+    str_dest[sizeof(char) * chunk.size] = 0;
 
     /* cleanup curl stuff */
     curl_easy_cleanup(curl_handle);

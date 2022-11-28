@@ -40,8 +40,11 @@ void free_catalog_info(catalog_info_t *info);
 
 // WIP
 catalog_offers_t* get_catalog_offers(catalog_info_t *catalog_info);
-
 // WIP
 catalog_offers_t* get_catalog_products(catalog_info_t *catalog_info, catalog_offers_t *catalog_offers);
+void free_offer(offer_t *offer);
+void free_offer_group(offer_group_t *offer_group);
+void free_catalog_offers(catalog_offers_t *catalog_offers);
+
 
 #endif
