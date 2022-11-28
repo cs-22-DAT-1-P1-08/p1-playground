@@ -1,9 +1,20 @@
 #include <curses.h>
 #include <string.h>
 
+unsigned int gcd(unsigned int large, unsigned int small)
+{
+    unsigned int remainder;
+    while (small > 0){
+        remainder = large % small;
+        large = small;
+        small = remainder;
+    }
+    return large;
+}
+
 int space(char* test, char* test2)
 {
-    int number=0;
+    int number;
     for (int i = 0; i < strlen(test)-strlen(test2)+1; ++i) {
         number++;
     }
@@ -24,13 +35,13 @@ void print_shopping_list(char* test, char* test2)
 
     lines(test,1);
 
-    mvprintw(1, 12+strlen(test), "+--- Foetex (0) ---+- SuperBrugsen (1) -+\n");
+    mvprintw(1, 12+strlen(test), "+--- Butik1 (0) ---+---- Butik2 (1) ----+\n");
     mvprintw(2, 10, "|%s | 12.25 kr (1L)    | 9.00 kr (1L)       |\n", test);
     mvprintw(3, 10, "|%s | 6.00 kr (500G)   | 7.50 kr (500G)     |\n", test2);
 
     lines(test,4);
-
     mvprintw(4, 12+strlen(test), "+------------------+--------------------+\n");
+
     mvprintw(5, 10, "|Total");
     number = strlen("|Distance") + space(test, "Distance") + 1;
     mvprintw(5, number, "| 46.25 kr         | 57.95 kr           |\n");
@@ -56,12 +67,6 @@ int main()
     initscr(); // Start curses mode
 
     print_shopping_list(name_test1, name_test2);
-
-    /*
-    mvprintw(1, 10, "+---------------");
-    mvprintw(2, 10, "| %s %dkr", name_test1, price_test1);
-    mvprintw(3, 10, "+---------------");
-    */
 
     refresh(); // Update screen
     getchar();
