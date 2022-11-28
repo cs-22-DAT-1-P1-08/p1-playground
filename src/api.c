@@ -85,7 +85,8 @@ int *route_time(geocode *places, char *transportation, char *apikey, size_t plac
             printf("ERROR an address was entirely empty");
             exit(EXIT_FAILURE);
         }
-        addr_to_geo(&places[i], apikey);
+        else if (i == 0) addr_to_geo(&places[i], apikey);
+        else store_to_geo(&places[i], apikey, places[0].lat, places[0].lng);
 
     }
     for (int i = 0; i < places_len; ++i) {
