@@ -38,6 +38,18 @@ typedef struct {
 void addr_to_geo(geocode *place, char* apikey);
 
 /**
+ * Returns an updated geocode element of store with full address and latitude and longitude
+ * depending on which store of the place_name is closest to the given lng and lat
+ * https://developer.here.com/documentation/geocoding-search-api/dev_guide/topics-api/code-discover-chain.html
+ *
+ * @param place struct geocode which is both used as argument and is what is returned
+ * @param apikey string which is used to get access to the here api
+ * @param lat the latitude of the position the stor has to be close to
+ * @param lng the longitude of the position the store has to be close to
+ */
+void store_to_geo(geocode *store, char* apikey, char *lat, char *lng);
+
+/**
  * Uses libcurl to calculate the time between multiple different geocode elements,
  * both between the individual destinations and the entire route,
  * by the way of transportation chosen to get the string with the information a call to the api_to_str is made.

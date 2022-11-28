@@ -64,6 +64,19 @@ void addr_to_geo(geocode *place, char* apikey) {
     free(str);
 }
 
+void store_to_geo(geocode *store, char* apikey, char *lat, char *lng) {
+    char url[200] = "https://discover.search.hereapi.com/v1/discover?";
+    add_if_api(url, apikey);
+    add_strings(url,  7, "at=", lat, ",", lng, "&limit=1&", "q=", store->place_name);
+
+    char *str = malloc(sizeof(char) * 10000);
+    api_to_str(url, "https", str);
+    printf("%s", str);
+
+    //TODO get lat and lng and rest of address info from json and update the geocode struct
+    free(str);
+}
+
 int *route_time(geocode *places, char *transportation, char *apikey, size_t places_len) {
     char url[200] = "https://wps.hereapi.com/2/findsequence.json?";
     add_if_api(url, apikey);
