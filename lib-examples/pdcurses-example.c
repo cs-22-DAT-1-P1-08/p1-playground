@@ -1,15 +1,26 @@
 #include <curses.h>
 #include <string.h>
 
-unsigned int gcd(unsigned int large, unsigned int small)
+struct demo_products
 {
-    unsigned int remainder;
-    while (small > 0){
-        remainder = large % small;
-        large = small;
-        small = remainder;
-    }
-    return large;
+    char* product_name;
+    char* amount;
+    int price;
+};
+
+int check_longest_word(char* test, char* test2)
+{
+    int result;
+    int maxLength = 0;
+
+    if (strlen(test) > strlen(test2))
+        maxLength = strlen(test);
+    else if (strlen(test) < strlen(test2))
+        maxLength = strlen(test2);
+
+    result = maxLength;
+
+    return result;
 }
 
 int space(char* test, char* test2)
@@ -29,44 +40,70 @@ void lines(char* test, int row)
     }
 }
 
-void print_shopping_list(char* test, char* test2)
+void print_shopping_list(char* test, struct demo_products products2[])
 {
+
+
+    int size = sizeof(products2->product_name) / sizeof(products2[0].product_name);
+
     int number;
+
+    mvprintw(0, 30, "Grocery list");
 
     lines(test,1);
 
     mvprintw(1, 12+strlen(test), "+--- Butik1 (0) ---+---- Butik2 (1) ----+\n");
-    mvprintw(2, 10, "|%s | 12.25 kr (1L)    | 9.00 kr (1L)       |\n", test);
-    mvprintw(3, 10, "|%s | 6.00 kr (500G)   | 7.50 kr (500G)     |\n", test2);
 
-    lines(test,4);
-    mvprintw(4, 12+strlen(test), "+------------------+--------------------+\n");
+    int i = 0;
+    while (i < 2+1)
+    {
+        mvprintw(2+i, 10, "|%s | 12.25 kr (1L)    | 9.00 kr (1L)       |", products2[i].product_name);
 
-    mvprintw(5, 10, "|Total");
+        i++;
+    }
+
+    lines(test,3+i);
+    mvprintw(3+i, 12+strlen(test), "+------------------+--------------------+\n");
+
+    mvprintw(4+i, 10, "|Total");
     number = strlen("|Distance") + space(test, "Distance") + 1;
-    mvprintw(5, number, "| 46.25 kr         | 57.95 kr           |\n");
+    mvprintw(4+i, number, "| 18.25 kr         | 16.50 kr           |\n");
 
-    lines(test,6);
-    mvprintw(6, 12+strlen(test), "+------------------+--------------------+\n\n");
+    lines(test,5+i);
+    mvprintw(5+i, 12+strlen(test), "+------------------+--------------------+\n\n");
 
-    mvprintw(7, 10, "|Distance");
+    mvprintw(6+i, 10, "|Distance");
     number = strlen("|Distance") + space(test, "Distance") + 1;
-    mvprintw(7, number, "| 551 meters away  | 2224 meters away   |\n");
+    mvprintw(6+i, number, "| 551 meters away  | 2224 meters away   |\n");
 
-    lines(test,8);
-    mvprintw(8, 12+strlen(test), "+------------------+--------------------+\n\n");
+    lines(test,7+i);
+    mvprintw(7+i, 12+strlen(test), "+------------------+--------------------+\n\n");
 }
 
 int main()
 {
+    struct demo_products products1[40];
+
     char name_test1[20] = "Product 1";
     char name_test2[20] = "Product 2";
+    char input[30];
     int price_test1 = 30;
     int price_test2 = 12;
 
     initscr(); // Start curses mode
 
-    print_shopping_list(name_test1, name_test2);
+    mvprintw(1, 1, "Enter products name (type q to stop)\n");
+
+    int i = 0;
+    while (strcmp(input, "q") != 0)
+    {
+        getstr(input);
+        products1[i].product_name = input;
+        mvprintw(2, 10, "%s", products1[i].product_name);
+        i++;
+    }
+
+    print_shopping_list(name_test1, products1);
 
     refresh(); // Update screen
     getchar();
