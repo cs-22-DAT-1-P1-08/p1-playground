@@ -1,10 +1,15 @@
 //
 // Created by carl on 28/11/2022.
 //
+#include "itemapi.h"
 #include <stdio.h>
 #include <string.h>
 #include <curl/curl.h>
-int main(int argc, char *argv[]){
+
+int printcurl(char* url, char* storeID, char* key){
+    char* fullurl;
+    strcpy(fullurl, url);
+    strcat(url, storeID);
     CURL *curl;
     CURLcode res;
     curl = curl_easy_init();
