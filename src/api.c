@@ -4,6 +4,7 @@
 #include <string.h>
 #include <curl/curl.h>
 #include <stdarg.h>
+#include <json-c/json.h>
 
 void add_strings(char *str_dest, int args,...) {
     va_list valist;
@@ -58,10 +59,31 @@ void addr_to_geo(geocode *place, char* apikey) {
 
     char *str = malloc(sizeof(char) * 10000);
     api_to_str(url, "https", str);
-    printf("%s", str);
+    fill_geocode(place, str);
 
-    //TODO get lat and lng and rest of address info from json and update the geocode struct
-    free(str);
+}
+void replace_address(geocode *place, json_object *address, int args,...) {
+    va_list valist;
+    va_start(valist, args);
+    for (int i = 0; i < args; ++i) {
+        const char *str = (char *)va_arg( valist, const char* );
+        const char *source = json_object_get_string(json_object_object_get(address, str));
+        set_address(place, i, (char *) source);
+    }
+    va_end(valist);
+}
+
+void fill_geocode (geocode *place, char *str){
+    json_object *jobj =json_tokener_parse(str);
+    json_object *items = json_object_object_get(jobj, "items");
+    json_object *item = json_object_array_get_idx(items, 0);
+    json_object *address = json_object_object_get(item, "address");
+
+    replace_address(place, address,6, "street","houseNumber","city","postalCode","county","state");
+    json_object *postion = json_object_object_get(item, "position");
+    strcpy(place->lat, json_object_get_string(json_object_object_get(postion, "lat")));
+    strcpy(place->lng, json_object_get_string(json_object_object_get(postion, "lng")));
+
 }
 
 void store_to_geo(geocode *store, char* apikey, char *lat, char *lng) {
@@ -73,7 +95,8 @@ void store_to_geo(geocode *store, char* apikey, char *lat, char *lng) {
     api_to_str(url, "https", str);
     printf("%s", str);
 
-    //TODO get lat and lng and rest of address info from json and update the geocode struct
+
+    fill_geocode (store, str);
     free(str);
 }
 
@@ -174,15 +197,15 @@ void api_to_str(char *url, char *protocol, char *str_dest) {
 }
 
 void initialize_geocode(geocode *place) {
-    place->postalCode   = "";
-    place->city         = "";
-    place->houseNumber  = "";
-    place->street       = "";
-    place->state        = "";
-    place->county       = "";
-    place->lat          = "";
-    place->lng          = "";
-    place->place_name   = "";
+    strcpy(place->postalCode, "");
+    strcpy(place->city,       "");
+    strcpy(place->houseNumber,   "");
+    strcpy(place->street       , "");
+    strcpy(place->state        , "");
+    strcpy(place->county       , "");
+    strcpy(place->lat          , "");
+    strcpy(place->lng          , "");
+    strcpy(place->place_name   , "");
 }
 
 void clrscr() {
@@ -197,6 +220,31 @@ char *get_address(geocode *place, int i) {
         case 3: return place->postalCode;
         case 4: return place->county;
         case 5: return place->state;
+        default:
+            printf("ERR out of index");
+            exit(0);
+    }
+}
+void set_address (geocode *place, int i, char *str){
+    switch (i) {
+        case 0:
+            strcpy(place->street, str);
+            break;
+        case 1:
+            strcpy(place->houseNumber,str);
+            break;
+        case 2:
+            strcpy(place->city, str);
+            break;
+        case 3:
+            strcpy(place->postalCode, str);
+            break;
+        case 4:
+            strcpy(place->county, str);
+            break;
+        case 5:
+            strcpy(place->state, str);
+            break;
         default:
             printf("ERR out of index");
             exit(0);
