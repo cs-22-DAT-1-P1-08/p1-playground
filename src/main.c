@@ -15,15 +15,13 @@ void tjek_api_temp() {
     while (offer_node != NULL) {
         offer_t *offer = (offer_t*)offer_node->data;
         if (offer->group == NULL) {
-            perror("Something is rotten in the state of Denmark...");
+            printf("Something is rotten in the state of Denmark...\n");
             offer_node = offer_node->next;
             continue;
         }
         printf("%.2lf kr, %s [%s]\n", offer->group->price, offer->title, offer->ean);
         offer_node = offer_node->next;
     }
-    printf("here\n");
-    //get_catalog_products(db_catalog_info);
 
     free_catalog_offers(catalog_offers);
     free_catalog_info(db_catalog_info);

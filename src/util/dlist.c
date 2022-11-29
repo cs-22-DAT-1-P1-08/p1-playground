@@ -14,13 +14,13 @@ dlist_t* dlist_insert(dlist_t *dlist, void *data, int at_tail) {
     }
 
     if (at_tail) {
-        dlist->head->prev = node;
-        node->next = dlist->head;
-        dlist->head = node;
-    } else {
         dlist->tail->next = node;
         node->prev = dlist->tail;
         dlist->tail = node;
+    } else {
+        dlist->head->prev = node;
+        node->next = dlist->head;
+        dlist->head = node;
     }
     dlist->count++;
 
@@ -76,7 +76,7 @@ void dlist_free_all(dlist_t *dlist, void free_node_data(void* node_data)) {
     dlist_node_t *node = dlist->head;
     while (node != NULL) {
         dlist_node_t  *next = node->next;
-        if (free_node_data != NULL)
+        if (free_node_data != NULL && node->data != NULL)
             free_node_data(node->data);
         free(node);
         node = next;
