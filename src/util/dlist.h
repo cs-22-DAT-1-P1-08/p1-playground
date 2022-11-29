@@ -26,5 +26,6 @@ void* dlist_remove_head(dlist_t *dlist);
 void* dlist_remove_tail(dlist_t *dlist);
 
 void dlist_free(dlist_t *dlist);
+void dlist_free_all(dlist_t *dlist, void free_node_data(void* node_data));
 
 #endif

@@ -65,12 +65,19 @@ dlist_t* dlist_add_head(dlist_t *dlist, void *data) {
 }
 
 void dlist_free(dlist_t *dlist) {
+    dlist_free_all(dlist, NULL);
+}
+
+
+void dlist_free_all(dlist_t *dlist, void free_node_data(void* node_data)) {
     if (dlist == NULL)
         return;
 
     dlist_node_t *node = dlist->head;
     while (node != NULL) {
         dlist_node_t  *next = node->next;
+        if (free_node_data != NULL)
+            free_node_data(node->data);
         free(node);
         node = next;
     }

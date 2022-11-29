@@ -91,16 +91,23 @@ void rec_child_views(json_object *j_view, catalog_offers_t *catalog_offers) {
             json_object *j_id = json_object_object_get(j_product, "id");
             json_object *j_title = json_object_object_get(j_product, "title");
 
+            int ean_len = json_object_get_string_len(j_id);
+            int title_len = json_object_get_string_len(j_title);
+
+            if (ean_len == 0 || title_len == 0)
+                continue;
+
             offer_t *offer = calloc(1, sizeof(offer_t));
 
-            offer->ean = calloc(json_object_get_string_len(j_id) + 1, sizeof(char));
+            offer->ean = calloc(ean_len + 1, sizeof(char));
             strcpy(offer->ean, json_object_get_string(j_id));
 
-            offer->title = calloc(json_object_get_string_len(j_title) + 1, sizeof(char));
+            offer->title = calloc( title_len + 1, sizeof(char));
             strcpy(offer->title, json_object_get_string(j_title));
 
             json_object *j_group_id = json_object_object_get(j_child_view, "id");
             char *group_id = json_object_get_string(j_group_id);
+
 
             dlist_node_t *group_node = catalog_offers->offer_groups->head;
             while (group_node != NULL) {
@@ -111,6 +118,8 @@ void rec_child_views(json_object *j_view, catalog_offers_t *catalog_offers) {
                     continue;
                 }
 
+            if (strcmp(offer->ean, "5789000094145") == 0)
+                printf("i am here %s %s %s\n", offer->ean, offer->title, group_id);
                 // found matching offer group, stop searching
                 offer->group = group;
                 dlist_add(group->offers, offer);
@@ -255,34 +264,9 @@ void free_catalog_offers(catalog_offers_t *catalog_offers) {
     if (catalog_offers == NULL)
         return;
 
-    dlist_t *offer_groups = catalog_offers->offer_groups;
-    if (offer_groups != NULL) {
-        dlist_node_t *group_node = offer_groups->head;
-        while (group_node != NULL) {
-            if (group_node->data == NULL)
-                continue;
 
-            dlist_node_t *next = group_node->next;
-            free_offer_group((offer_group_t*)group_node->data);
-            group_node = next;
-        }
-        dlist_free(offer_groups);
-    }
-
-    dlist_t *offers = catalog_offers->offers;
-    if (offers != NULL) {
-        dlist_node_t *offer_node = offers->head;
-        while (offer_node != NULL) {
-            if (offer_node->data == NULL)
-                continue;
-
-            dlist_node_t *next = offer_node->next;
-            free_offer((offer_t*)offer_node->data);
-            offer_node = next;
-        }
-        dlist_free(offers);
-    }
-
+    dlist_free_all(catalog_offers->offer_groups, (void (*)(void *)) free_offer_group);
+    dlist_free_all(catalog_offers->offers, (void (*)(void *)) free_offer);
     free(catalog_offers);
 }
 
