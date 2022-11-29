@@ -1,4 +1,5 @@
 #include "api.h"
+#include "api_p.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -60,8 +61,8 @@ void addr_to_geo(geocode *place, char* apikey) {
     char *str = malloc(sizeof(char) * 10000);
     api_to_str(url, "https", str);
     fill_geocode(place, str);
-
 }
+
 void replace_address(geocode *place, json_object *address, int args,...) {
     va_list valist;
     va_start(valist, args);
@@ -78,7 +79,6 @@ void fill_geocode (geocode *place, char *str){
     json_object *items = json_object_object_get(jobj, "items");
     json_object *item = json_object_array_get_idx(items, 0);
     json_object *address = json_object_object_get(item, "address");
-
     replace_address(place, address,6, "street","houseNumber","city","postalCode","county","state");
     json_object *postion = json_object_object_get(item, "position");
     strcpy(place->lat, json_object_get_string(json_object_object_get(postion, "lat")));
@@ -199,50 +199,50 @@ void api_to_str(char *url, char *protocol, char *str_dest) {
 void initialize_geocode(geocode *place) {
     strcpy(place->postalCode, "");
     strcpy(place->city,       "");
-    strcpy(place->houseNumber,   "");
-    strcpy(place->street       , "");
-    strcpy(place->state        , "");
-    strcpy(place->county       , "");
-    strcpy(place->lat          , "");
-    strcpy(place->lng          , "");
-    strcpy(place->place_name   , "");
+    strcpy(place->houseNumber,"");
+    strcpy(place->street,     "");
+    strcpy(place->state,      "");
+    strcpy(place->county,     "");
+    strcpy(place->lat,        "");
+    strcpy(place->lng,        "");
+    strcpy(place->place_name, "");
 }
 
 void clrscr() {
     system("@cls||clear");
 }
 
-char *get_address(geocode *place, int i) {
+char *get_address(geocode *place, AddressComponent i) {
     switch(i) {
-        case 0: return place->street;
-        case 1: return place->houseNumber;
-        case 2: return place->city;
-        case 3: return place->postalCode;
-        case 4: return place->county;
-        case 5: return place->state;
+        case STREET:        return place->street;
+        case HOUSE_NUMBER:  return place->houseNumber;
+        case CITY:          return place->city;
+        case POSTAL_CODE:   return place->postalCode;
+        case COUNTY:        return place->county;
+        case STATE:         return place->state;
         default:
             printf("ERR out of index");
             exit(0);
     }
 }
-void set_address (geocode *place, int i, char *str){
+void set_address (geocode *place, AddressComponent i, char *str){
     switch (i) {
-        case 0:
+        case STREET:
             strcpy(place->street, str);
             break;
-        case 1:
+        case HOUSE_NUMBER:
             strcpy(place->houseNumber,str);
             break;
-        case 2:
+        case CITY:
             strcpy(place->city, str);
             break;
-        case 3:
+        case POSTAL_CODE:
             strcpy(place->postalCode, str);
             break;
-        case 4:
+        case COUNTY:
             strcpy(place->county, str);
             break;
-        case 5:
+        case STATE:
             strcpy(place->state, str);
             break;
         default:
