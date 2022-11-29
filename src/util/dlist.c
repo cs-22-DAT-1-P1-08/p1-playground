@@ -14,13 +14,13 @@ dlist_t* dlist_insert(dlist_t *dlist, void *data, int at_tail) {
     }
 
     if (at_tail) {
-        dlist->head->prev = node;
-        node->next = dlist->head;
-        dlist->head = node;
-    } else {
         dlist->tail->next = node;
         node->prev = dlist->tail;
         dlist->tail = node;
+    } else {
+        dlist->head->prev = node;
+        node->next = dlist->head;
+        dlist->head = node;
     }
     dlist->count++;
 
