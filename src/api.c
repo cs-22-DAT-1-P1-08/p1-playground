@@ -93,28 +93,30 @@ void store_to_geo(geocode *store, char* apikey, char *lat, char *lng) {
     add_strings(url, 6, "at=", lat, ",", lng, "&categories=600-6300-0066&name=", store->place_name);
     char *str = malloc(sizeof(char) * 100000);
     api_to_str(url, "https", str);
-    int i = -1;
+    int i;
     json_object *find_payment = NULL;
     json_object *items = json_tokener_parse(str);
     items = json_object_object_get(items, "items");
-    while (find_payment == NULL) {
-        i++;
+    for ( i = 0; i < json_object_array_length(items); ++i) {
+
         find_payment = json_object_array_get_idx(items, i);
         find_payment = json_object_object_get(find_payment, "payment");
+        if (find_payment != NULL) break;
+
     }
     fill_geocode(store, str , i);
     free(str);
 }
 
 int *route_time(geocode *places, char *transportation, char *apikey, size_t places_len) {
-    char url[200] = "https://wps.hereapi.com/2/findsequence.json?";
+    char url[1000] = "https://wps.hereapi.com/2/findsequence.json?";
     add_if_api(url, apikey);
     for (int i = 0; i < places_len; ++i) {
         if (is_addr_empty(&places[i])) {
             printf("ERROR an address was entirely empty");
             exit(EXIT_FAILURE);
         }
-        else if (i == 0) addr_to_geo(&places[i], apikey);
+        else if (strncmp("home",places[i].place_name,4)== 0) addr_to_geo(&places[i], apikey);
         else store_to_geo(&places[i], apikey, places[0].lat, places[0].lng);
 
     }
@@ -123,20 +125,32 @@ int *route_time(geocode *places, char *transportation, char *apikey, size_t plac
         else if (i == places_len - 1) strcat(url, "end=");
         else {
             strcat(url, "destination");
-            itoa(i, url, 10);
+            char arr_numb[5];
+            itoa(i, arr_numb, 10);
+            strcat(url, arr_numb);
             strcat(url, "=");
         }
         add_strings(url, 6, places[i].place_name, ";", places[i].lat, ",", places[i].lng, "&");
     }
-    add_strings(url, 3,"improveFor=time&mode=fastest;", transportation, ";");
+    add_strings(url, 2,"improveFor=time&mode=fastest;", transportation);
 
-    printf("url :%s", url);
-    char *str = malloc(sizeof(char) * 10000);
+    char *str = malloc(sizeof(char) * 100000);
     api_to_str(url, "https", str);
-    printf("%s", str);
 
-    //TODO get time spent between every destination and the final time from the json output
+    int *travel_time = malloc(sizeof (int) *places_len);
+    json_object *jjobj = json_tokener_parse(str);
+    json_object *results = json_object_object_get(jjobj, "results");
+    json_object *result = json_object_array_get_idx(results, 0);
+    travel_time[0] = json_object_get_int(json_object_object_get(result, "time"));
+    json_object *interconnections = json_object_object_get(result, "interconnections");
+    for (int i = 1; i < places_len; ++i) {
+
+        json_object *interconnection = json_object_array_get_idx(interconnections, i-1);
+        travel_time[i] = json_object_get_int(json_object_object_get(interconnection, "time"));
+    }
     free(str);
+return travel_time;
+
 }
 
 //https://curl.se/libcurl/c/getinmemory.html

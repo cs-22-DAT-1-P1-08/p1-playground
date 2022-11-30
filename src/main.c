@@ -24,8 +24,20 @@ int main() {
     //for (int i = 0; i < 6; ++i) {
     //    printf("\n%s", get_address(&spar, i));
     //}
-    geocode places[2] = {hjem, spar};
-    route_time(places, "car", apikey, 2);
+    geocode hjem_igen;
+    initialize_geocode(&hjem_igen);
+    strcpy(hjem_igen.street, "Hadsundvej");
+    strcpy(hjem_igen.houseNumber, "44");
+    strcpy(hjem_igen.postalCode, "9000");
+    strcpy(hjem_igen.place_name, "home2");
+    addr_to_geo(&hjem_igen, apikey);
+    geocode places[] = {hjem, spar, hjem_igen};
+    int *arr = route_time(places, "pedestrian", apikey, 3);
+
+    for (int i = 0; i < 3; ++i) {
+        printf("\n\n%d",arr[i]);
+
+    }
     /*
     geocode hulla;
     initialize_geocode(&hulla);
