@@ -7,14 +7,13 @@
 
 /***
  */
-int printcurl(char* url, char* storeID, char* key);
+int printcurl(char* url, char* storeID);
 
 typedef struct item{
+    char* ean;
     double price;
     char* name;
-    char* ean;
     double amount;
-
 } item;
 
 
