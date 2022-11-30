@@ -76,7 +76,7 @@ void dlist_free_all(dlist_t *dlist, void free_node_data(void* node_data)) {
     dlist_node_t *node = dlist->head;
     while (node != NULL) {
         dlist_node_t  *next = node->next;
-        if (free_node_data != NULL)
+        if (free_node_data != NULL && node->data != NULL)
             free_node_data(node->data);
         free(node);
         node = next;
