@@ -4,6 +4,16 @@
 #include <stdio.h>
 #include <json-c/json.h>
 
+enum AddressComponent {
+    STREET,
+    HOUSE_NUMBER,
+    CITY,
+    POSTAL_CODE,
+    COUNTY,
+    STATE
+};
+typedef enum AddressComponent AddressComponent;
+
 /**
  * Includes strings for
  * @param Address \n
@@ -69,5 +79,20 @@ int *route_time(geocode *places, char *transportation, char* apikey, size_t plac
  * @param place a geocode struct
  */
 void initialize_geocode(geocode *place);
+
+/**
+ * A function which makes it possible to iterate through the address part of the geocode struct.
+ * @param place the geocode element
+ * @param i The part of the address which is to be returned as a string \n
+ * 0: street.       \n
+ * 1: houseNumber.  \n
+ * 2: city.         \n
+ * 3: postalCode.   \n
+ * 4: county.       \n
+ * 5: state.        \n
+ * @return A string from place depending on which i is parsed.
+ */
+char *get_address(geocode *place, AddressComponent i);
+
 
 #endif //UNTITLED_API_H

@@ -60,7 +60,8 @@ void addr_to_geo(geocode *place, char* apikey) {
 
     char *str = malloc(sizeof(char) * 10000);
     api_to_str(url, "https", str);
-    fill_geocode(place, str);
+    fill_geocode(place, str, 0);
+    free(str);
 }
 
 void replace_address(geocode *place, json_object *address, int args,...) {
@@ -74,29 +75,34 @@ void replace_address(geocode *place, json_object *address, int args,...) {
     va_end(valist);
 }
 
-void fill_geocode (geocode *place, char *str){
+void fill_geocode(geocode *place, char *str, int item_num){
     json_object *jobj =json_tokener_parse(str);
     json_object *items = json_object_object_get(jobj, "items");
-    json_object *item = json_object_array_get_idx(items, 0);
+    json_object *item = json_object_array_get_idx(items, item_num);
     json_object *address = json_object_object_get(item, "address");
     replace_address(place, address,6, "street","houseNumber","city","postalCode","county","state");
     json_object *postion = json_object_object_get(item, "position");
     strcpy(place->lat, json_object_get_string(json_object_object_get(postion, "lat")));
     strcpy(place->lng, json_object_get_string(json_object_object_get(postion, "lng")));
-
 }
 
+//https://browse.search.hereapi.com/v1/browse?at=57.04074,9.95146&categories=600-6300-0066,800-8500-0178&name=rema 1000&apiKey=4nt5IVcSUaha7lK7Bx8f3PagaNfgP6QRyEYF3ZOMksA
 void store_to_geo(geocode *store, char* apikey, char *lat, char *lng) {
-    char url[200] = "https://discover.search.hereapi.com/v1/discover?";
+    char url[200] = "https://browse.search.hereapi.com/v1/browse?";
     add_if_api(url, apikey);
-    add_strings(url,  7, "at=", lat, ",", lng, "&limit=1&", "q=", store->place_name);
-
-    char *str = malloc(sizeof(char) * 10000);
+    add_strings(url, 6, "at=", lat, ",", lng, "&categories=600-6300-0066&name=", store->place_name);
+    char *str = malloc(sizeof(char) * 100000);
     api_to_str(url, "https", str);
-    printf("%s", str);
-
-
-    fill_geocode (store, str);
+    int i = -1;
+    json_object *find_payment = NULL;
+    json_object *items = json_tokener_parse(str);
+    items = json_object_object_get(items, "items");
+    while (find_payment == NULL) {
+        i++;
+        find_payment = json_object_array_get_idx(items, i);
+        find_payment = json_object_object_get(find_payment, "payment");
+    }
+    fill_geocode(store, str , i);
     free(str);
 }
 
@@ -120,9 +126,11 @@ int *route_time(geocode *places, char *transportation, char *apikey, size_t plac
             itoa(i, url, 10);
             strcat(url, "=");
         }
-        add_strings(url, 8, places[i].place_name, ";", places[i].place_name, ";", places[i].lat, ",", places[i].lng, "&");
+        add_strings(url, 6, places[i].place_name, ";", places[i].lat, ",", places[i].lng, "&");
     }
     add_strings(url, 3,"improveFor=time&mode=fastest;", transportation, ";");
+
+    printf("url :%s", url);
     char *str = malloc(sizeof(char) * 10000);
     api_to_str(url, "https", str);
     printf("%s", str);
@@ -225,7 +233,7 @@ char *get_address(geocode *place, AddressComponent i) {
             exit(0);
     }
 }
-void set_address (geocode *place, AddressComponent i, char *str){
+void set_address(geocode *place, AddressComponent i, char *str){
     switch (i) {
         case STREET:
             strcpy(place->street, str);

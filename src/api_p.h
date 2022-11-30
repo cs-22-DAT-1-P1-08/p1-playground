@@ -1,20 +1,13 @@
 #ifndef P1_PLAYGROUND_API_P_H
 #define P1_PLAYGROUND_API_P_H
 
+#include "api.h"
+
 typedef struct {
     char *memory;
     size_t size;
 } MemoryStruct;
 
-enum AddressComponent {
-    STREET,
-    HOUSE_NUMBER,
-    CITY,
-    POSTAL_CODE,
-    COUNTY,
-    STATE
-};
-typedef enum AddressComponent AddressComponent;
 
 /**
  * Uses libcurl to make get request through a passed url, the output of the request is through a helping function
@@ -24,20 +17,6 @@ typedef enum AddressComponent AddressComponent;
  * @param str_dest the string which the output of the get request is parsed to.
  */
 void api_to_str(char *url, char *protocol, char *str_dest);
-
-/**
- * A function which makes it possible to iterate through the address part of the geocode struct.
- * @param place the geocode element
- * @param i The part of the address which is to be returned as a string \n
- * 0: street.       \n
- * 1: houseNumber.  \n
- * 2: city.         \n
- * 3: postalCode.   \n
- * 4: county.       \n
- * 5: state.        \n
- * @return A string from place depending on which i is parsed.
- */
-char *get_address(geocode *place, AddressComponent i);
 
 /**
  * Uses strarg library to add unlimited arguments to str_dest
@@ -71,9 +50,10 @@ void replace_address(geocode *place, json_object *address, int args,...);
  * lat and lng is taken from postion in the json_object, and passed into place's elements (lat and lng)
  * @param place Geocode struct which elements get updated
  * @param str is a string in json format which is used to initialize a json_object
+ * @param item_num is the item in the array of different locations which is to be used
  */
 
-void fill_geocode (geocode *place, char *str);
+void fill_geocode (geocode *place, char *str, int item_num);
 
 /**
  * Switch case, which copies with strcpy on to the element of place which correlates with the iterator i
