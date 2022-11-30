@@ -44,7 +44,7 @@ void print_shopping_list(char* test, struct demo_products products2[])
 {
 
 
-    int size = sizeof(products2->product_name) / sizeof(products2[0].product_name);
+    //int size = sizeof(products2->product_name) / sizeof(products2[0].product_name);
 
     int number;
 
@@ -57,7 +57,7 @@ void print_shopping_list(char* test, struct demo_products products2[])
     int i = 0;
     while (i < 2+1)
     {
-        mvprintw(2+i, 10, "|%s | 12.25 kr (1L)    | 9.00 kr (1L)       |", products2[i].product_name);
+        mvprintw(2+i, 10, "|%s | 12.25 kr (1L)    | 9.00 kr (1L)       |", products2[0+i].product_name);
 
         i++;
     }
@@ -84,6 +84,10 @@ int main()
 {
     struct demo_products products1[40];
 
+    int i = 0;
+
+    //int size = sizeof(products1) / sizeof(products1[0]); //Size of cards struct array
+
     char name_test1[20] = "Product 1";
     char name_test2[20] = "Product 2";
     char input[30];
@@ -94,13 +98,19 @@ int main()
 
     mvprintw(1, 1, "Enter products name (type q to stop)\n");
 
-    int i = 0;
     while (strcmp(input, "q") != 0)
     {
         getstr(input);
-        products1[i].product_name = input;
-        mvprintw(2, 10, "%s", products1[i].product_name);
+
+        if (strcmp(input, "q") == 0) break;
+        else products1[i].product_name = input;
+
         i++;
+    }
+
+    for (int j = 0; j < 3; ++j)
+    {
+        mvprintw(2+j, 100, "%s", products1[j].product_name);
     }
 
     print_shopping_list(name_test1, products1);
