@@ -7,7 +7,18 @@
 #include "../util/dlist.h"
 
 
+enum AmountUnit {
+    GRAMS,
+    LITERS,
+    PIECES
+};
 
+typedef struct amount_t {
+    enum AmountUnit unit_type;
+    double amount;
+} amount_t;
+
+amount_t* find_amount_from_string(char* input_str);
 
 
 /**
@@ -24,7 +35,8 @@ typedef struct item_t{
     char* ean;
     double price;
     char* name;
-    char* amount;
+    char* details;
+    amount_t* amount;
 } item_t;
 
 

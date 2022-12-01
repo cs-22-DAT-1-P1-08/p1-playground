@@ -16,11 +16,29 @@ int main() {
 }
 
 void coop_api_temp(void){
+    amount_t *test = find_amount_from_string("ENTRECOTE 350G");
+    if (test == NULL) {
+        fprintf(stderr, "null");
+        exit(EXIT_FAILURE);
+    }
+    printf("%lf", test->amount);
+
+    return;
     /* Daglibrugsen */
     dlist_t* list_dagligbrugsen = coop_get_items("1290");
 
     /* coop 365 */
     dlist_t* list_coop365 = coop_get_items("24165");
+
+    dlist_node_t *item_node = list_dagligbrugsen->head;
+    while (item_node != NULL) {
+        item_t *item = item_node->data;
+        if (item->amount != NULL) {
+            printf("%s: %.2lf %d\n", item->name, item->amount->amount, item->amount->unit_type);
+        }
+
+        item_node = item_node->next;
+    }
 
 
     dlist_free_all(list_dagligbrugsen, (void (*)(void *)) free_item);

@@ -66,8 +66,8 @@ dlist_t* coop_get_items(char* store_id){
         item->ean = calloc(strlen(json_object_get_string(j_ean)) + 1, sizeof(char));
         strcpy(item->ean, json_object_get_string(j_ean));
 
-        item->amount = calloc(strlen(json_object_get_string(j_amount)) + 1, sizeof(char));
-        strcpy(item->amount, json_object_get_string(j_amount));
+        item->details = calloc(strlen(json_object_get_string(j_amount)) + 1, sizeof(char));
+        strcpy(item->details, json_object_get_string(j_amount));
 
         item->amount = find_amount_from_string(item->details);
         if (item->amount == NULL)
@@ -82,9 +82,21 @@ dlist_t* coop_get_items(char* store_id){
 
 /* Deallocate memory assigned to item */
 void free_item(item_t* item){
-    free(item->name);
-    free(item->ean);
-    free(item->amount);
+    if (item == NULL)
+        return;
+
+    if (item->name != NULL)
+        free(item->name);
+
+    if (item->ean != NULL)
+        free(item->ean);
+
+    if (item->details != NULL)
+        free(item->details);
+
+    if (item->amount != NULL)
+        free(item->amount);
+
     free(item);
 }
 
