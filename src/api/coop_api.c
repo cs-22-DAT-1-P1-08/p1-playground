@@ -11,11 +11,10 @@
 
 
 
-#define COOP_PRODUCT_API_URL "https://api.cl.coop.dk/productapi/v1/product/"
+#define COOP_PRODUCT_API_URL "https://p1.theodor.dev/coop-api-proxy/v1/product/"
 
 // Proxy with api from above with certain changes, such as æ, ø and å made into ae, oe and aa.
 // Also only updates every 12 hours to take into account the 200 pulls a week limit for the API
-#define GROUP_API_PROXY "https://p1.theodor.dev/coop-api-proxy/v1/product/"
 
 
 
@@ -24,23 +23,11 @@
 dlist_t* coop_get_items(char* store_id){
     /* Merges the URL with the store ID to retrieve data from relevant API */
     char full_url[100];
-    strcpy(full_url, GROUP_API_PROXY);
+    strcpy(full_url, COOP_PRODUCT_API_URL);
     strcat(full_url, store_id);
 
-    /* Creates API key from environment variables and the prefix needed */
-    char full_key[100] = "Ocp-Apim-Subscription-Key: ";
-    char* key = getenv("CoopAPIKey");
-    if (key == NULL){
-        fprintf(stderr, "Failed to find CoopAPIKey in environment variables");
-        exit(EXIT_FAILURE);
-    }
-    strcat(full_key, key);
-
     /* Retrieve URL contents as text */
-    struct curl_slist *headers = NULL;
-    headers = curl_slist_append(headers, full_key);
-    char* res = curlext_easy_hfetch(full_url, "https", "", headers);
-    curl_slist_free_all(headers);
+    char* res = curlext_easy_fetch(full_url, "https");
 
     /* Convert retrieved text to json object */
     json_object* root = json_tokener_parse(res);

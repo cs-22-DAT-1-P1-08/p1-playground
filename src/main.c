@@ -16,14 +16,6 @@ int main() {
 }
 
 void coop_api_temp(void){
-    amount_t *test = find_amount_from_string("ENTRECOTE 350G");
-    if (test == NULL) {
-        fprintf(stderr, "null");
-        exit(EXIT_FAILURE);
-    }
-    printf("%lf", test->amount);
-
-    return;
     /* Daglibrugsen */
     dlist_t* list_dagligbrugsen = coop_get_items("1290");
 
