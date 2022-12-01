@@ -20,6 +20,7 @@
 
 
 
+
 dlist_t* coop_get_items(char* store_id){
     /* Merges the URL with the store ID to retrieve data from relevant API */
     char full_url[100];
@@ -68,6 +69,10 @@ dlist_t* coop_get_items(char* store_id){
         item->amount = calloc(strlen(json_object_get_string(j_amount)) + 1, sizeof(char));
         strcpy(item->amount, json_object_get_string(j_amount));
 
+        item->amount = find_amount_from_string(item->details);
+        if (item->amount == NULL)
+            item->amount = find_amount_from_string(item->name);
+
         item->price = json_object_get_double(j_price);
 
         dlist_add(item_list, item);
@@ -83,3 +88,91 @@ void free_item(item_t* item){
     free(item);
 }
 
+amount_t* find_amount_from_string(char* input_str){
+    static const int NUMBER_BUFFER_SIZE = 20;
+
+    amount_t *result = calloc(1, sizeof(amount_t));
+    int input_len = (int)strlen(input_str);
+    result->amount = -1;
+
+    double multiplier = 1;
+
+    char number_buffer[NUMBER_BUFFER_SIZE];
+    int number_len = 0;
+
+    for (int i = 0; i < input_len; i++) {
+        // Ignore whitespace
+        if (input_str[i] == ' ') continue;
+
+        //printf("Magic? Quantum computer?\n");
+
+        /* Handle number sequences */
+        if (strchr("0123456789", input_str[i])) {
+            // reset existing number buffer
+            number_len = 0;
+            memset(number_buffer, 0, sizeof(number_buffer));
+
+            while (i < input_len && strchr("0123456789", input_str[i])) {
+                number_buffer[number_len++] = input_str[i];
+                i++;
+            }
+        }
+
+
+        /* Handle character sequences */
+        int start_index = i;
+
+        while (++i < input_len && isalpha(input_str[i])) continue;
+        int len = i - start_index;
+
+
+        // Did not find sequence or does not have an amount number stored
+        if (len == 0 && number_len == 0) continue;
+
+        // Get this character sequence as separate string (substring)
+        char word[len];
+        memcpy(word, &input_str[start_index], len);
+
+        /* Handle unit or multiplier keywords */
+        if (strcmp(word, "G") == 0 || strcmp(word, "GRAM") == 0) {
+            result->unit_type = GRAMS;
+            result->amount = multiplier * atoi(number_buffer);
+        }
+        else if (strcmp(word, "KG") == 0) {
+            result->unit_type = GRAMS;
+            result->amount = multiplier * atoi(number_buffer) * 1000;
+        }
+        else if (strcmp(word, "L") == 0 || strcmp(word, "LITER") == 0){
+            result->unit_type = LITERS;
+            result->amount = multiplier * atoi(number_buffer);
+        }
+        else if (strcmp(word, "CL") == 0 || strcmp(word, "CENTILITER") == 0){
+            result->unit_type = LITERS;
+            result->amount = multiplier * atoi(number_buffer)/100;
+        }
+        else if (strcmp(word, "DL") == 0 || strcmp(word, "DECILITER") == 0){
+            result->unit_type = LITERS;
+            result->amount = multiplier * atoi(number_buffer)/10;
+        }
+        else if (strcmp(word, "ML") == 0 || strcmp(word, "MINILITER") == 0){
+            result->unit_type = LITERS;
+            result->amount = multiplier * atoi(number_buffer)/100;
+        }
+        else if (strcmp(word, "STK") == 0){
+            result->unit_type = PIECES;
+            result->amount = multiplier * atoi(number_buffer);
+        }
+        else if (strcmp(word, "X") == 0) {
+            multiplier = (double)atoi(number_buffer);
+        }
+
+    }
+
+    // Amount not found in string
+    if (result->amount == -1) {
+        free(result);
+        return NULL;
+    }
+
+    return result;
+}
