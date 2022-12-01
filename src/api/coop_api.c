@@ -142,7 +142,9 @@ amount_t* find_amount_from_string(char* input_str){
         if (len == 0 && number_len == 0) continue;
 
         // Get this character sequence as separate string (substring)
-        char word[len];
+        char word[len + 1];
+        word[len] = '\0';
+
         memcpy(word, &input_str[start_index], len);
 
         /* Handle unit or multiplier keywords */
