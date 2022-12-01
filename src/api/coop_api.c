@@ -9,12 +9,21 @@
 #include <json-c/json.h>
 #include "curl/curl.h"
 
+
+
 #define COOP_PRODUCT_API_URL "https://api.cl.coop.dk/productapi/v1/product/"
+
+// Proxy with api from above with certain changes, such as æ, ø and å made into ae, oe and aa.
+// Also only updates every 12 hours to take into account the 200 pulls a week limit for the API
+#define GROUP_API_PROXY "https://p1.theodor.dev/coop-api-proxy/v1/product/"
+
+
+
 
 dlist_t* coop_get_items(char* store_id){
     /* Merges the URL with the store ID to retrieve data from relevant API */
     char full_url[100];
-    strcpy(full_url, COOP_PRODUCT_API_URL);
+    strcpy(full_url, GROUP_API_PROXY);
     strcat(full_url, store_id);
 
     /* Creates API key from environment variables and the prefix needed */
@@ -35,7 +44,7 @@ dlist_t* coop_get_items(char* store_id){
     /* Convert retrieved text to json object */
     json_object* root = json_tokener_parse(res);
     if (root == NULL || json_object_get_type(root) != json_type_array){
-        fprintf(stderr, "Recieved invalid data from COOP API\n%s", res);
+        fprintf(stderr, "Received invalid data from COOP API\n%s", res);
         exit(EXIT_FAILURE);
     }
     free(res);
