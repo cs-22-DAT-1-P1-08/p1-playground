@@ -19,7 +19,7 @@ typedef struct amount_t {
 } amount_t;
 
 amount_t* find_amount_from_string(char* input_str);
-
+const char* get_unit_name(enum AmountUnit unit);
 
 /**
  * Retrieves all items from a given coop store.

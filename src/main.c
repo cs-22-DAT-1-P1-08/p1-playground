@@ -26,7 +26,7 @@ void coop_api_temp(void){
     while (item_node != NULL) {
         item_t *item = item_node->data;
         if (item->amount != NULL) {
-            printf("%s: %.2lf %d\n", item->name, item->amount->amount, item->amount->unit_type);
+            printf("%s: %.2lf %s\n", item->name, item->amount->amount, get_unit_name(item->amount->unit_type));
         }
 
         item_node = item_node->next;

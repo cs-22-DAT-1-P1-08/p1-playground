@@ -177,3 +177,8 @@ amount_t* find_amount_from_string(char* input_str){
 
     return result;
 }
+
+const char* get_unit_name(enum AmountUnit unit) {
+    static const char* names[] = { "grams", "liters", "pieces"};
+    return names[unit];
+}
