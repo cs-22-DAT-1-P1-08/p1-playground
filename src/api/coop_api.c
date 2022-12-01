@@ -115,6 +115,8 @@ amount_t* find_amount_from_string(char* input_str){
                 number_buffer[number_len++] = input_str[i];
                 i++;
             }
+
+            continue;
         }
 
 
