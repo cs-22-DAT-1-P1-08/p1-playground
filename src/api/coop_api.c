@@ -9,7 +9,7 @@
 #include <json-c/json.h>
 #include "curl/curl.h"
 
-// Proxy with api from above with certain changes, such as æ, ø and å made into ae, oe and aa.
+// API proxy with certain changes, such as æ, ø and å made into ae, oe and aa.
 // Also only updates every 12 hours to take into account the 200 pulls a week limit for the API
 #define COOP_PRODUCT_API_URL "https://p1.theodor.dev/coop-api-proxy/v1/product/"
 
