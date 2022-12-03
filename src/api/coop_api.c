@@ -103,8 +103,6 @@ amount_t* find_amount_from_string(char* input_str){
         // Ignore whitespace
         if (input_str[i] == ' ') continue;
 
-        //printf("Magic? Quantum computer?\n");
-
         /* Handle number sequences */
         if (strchr("0123456789", input_str[i])) {
             // reset existing number buffer
