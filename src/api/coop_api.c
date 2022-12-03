@@ -140,11 +140,11 @@ amount_t* find_amount_from_string(char* input_str){
         }
         else if (strcmp(word, "CL") == 0 || strcmp(word, "CENTILITER") == 0){
             result->unit_type = LITERS;
-            result->amount = multiplier * atoi(number_buffer)/10;
+            result->amount = multiplier * atoi(number_buffer)/100;
         }
         else if (strcmp(word, "DL") == 0 || strcmp(word, "DECILITER") == 0){
             result->unit_type = LITERS;
-            result->amount = multiplier * atoi(number_buffer)/100;
+            result->amount = multiplier * atoi(number_buffer)/10;
         }
         else if (strcmp(word, "ML") == 0 || strcmp(word, "MILLILITER") == 0){
             result->unit_type = LITERS;
