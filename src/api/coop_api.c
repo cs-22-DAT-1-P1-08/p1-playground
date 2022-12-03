@@ -9,16 +9,9 @@
 #include <json-c/json.h>
 #include "curl/curl.h"
 
-
-
-#define COOP_PRODUCT_API_URL "https://p1.theodor.dev/coop-api-proxy/v1/product/"
-
 // Proxy with api from above with certain changes, such as æ, ø and å made into ae, oe and aa.
 // Also only updates every 12 hours to take into account the 200 pulls a week limit for the API
-
-
-
-
+#define COOP_PRODUCT_API_URL "https://p1.theodor.dev/coop-api-proxy/v1/product/"
 
 dlist_t* coop_get_items(char* store_id){
     /* Merges the URL with the store ID to retrieve data from relevant API */
@@ -117,13 +110,11 @@ amount_t* find_amount_from_string(char* input_str){
             continue;
         }
 
-
         /* Handle character sequences */
         int start_index = i;
 
         while (++i < input_len && isalpha(input_str[i])) continue;
         int len = i - start_index;
-
 
         // Did not find sequence or does not have an amount number stored
         if (len == 0 && number_len == 0) continue;
@@ -166,7 +157,6 @@ amount_t* find_amount_from_string(char* input_str){
         else if (strcmp(word, "X") == 0) {
             multiplier = (double)atoi(number_buffer);
         }
-
     }
 
     // Amount not found in string
