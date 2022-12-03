@@ -121,7 +121,7 @@ amount_t* find_amount_from_string(char* input_str){
 
         // Get this character sequence as separate string (substring)
         char word[len + 1];
-        word[len] = '\0';
+        memset(word, 0, len + 1);
 
         memcpy(word, &input_str[start_index], len);
 
