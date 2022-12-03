@@ -146,7 +146,7 @@ amount_t* find_amount_from_string(char* input_str){
             result->unit_type = LITERS;
             result->amount = multiplier * atoi(number_buffer)/10;
         }
-        else if (strcmp(word, "ML") == 0 || strcmp(word, "MINILITER") == 0){
+        else if (strcmp(word, "ML") == 0 || strcmp(word, "MILLILITER") == 0){
             result->unit_type = LITERS;
             result->amount = multiplier * atoi(number_buffer)/100;
         }
