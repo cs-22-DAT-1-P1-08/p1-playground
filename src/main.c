@@ -43,7 +43,8 @@ void print_products(store_t *store) {
 }
 
 void search_prototype(store_t *daglibrugsen, store_t *coop365) {
-    char temp_search_term[100] = "";
+    char temp_search_term[100];
+    memset(temp_search_term, 0, 100);
     printf("Enter search term: ");
     scanf("%s", temp_search_term);
 
@@ -55,7 +56,7 @@ void search_prototype(store_t *daglibrugsen, store_t *coop365) {
     else printf("Dagli'Brugsen: Not found");
 
     item_t *cheapest365 = find_cheapest_match(coop365, temp_search_term);
-    if (db_cheapest != NULL)
+    if (db_cheapest != NULL && db_cheapest->name != NULL)
         printf("Coop 365: %s (%.2lf kr)\n", cheapest365->name, cheapest365->price);
     else printf("Coop 365: Not found");
 }

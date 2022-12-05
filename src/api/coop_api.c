@@ -92,6 +92,8 @@ amount_t* find_amount_from_string(char* input_str){
     char number_buffer[NUMBER_BUFFER_SIZE];
     int number_len = 0;
 
+    double temp_number = 0;
+
     for (int i = 0; i < input_len; i++) {
         // Ignore whitespace
         if (input_str[i] == ' ') continue;
@@ -102,11 +104,16 @@ amount_t* find_amount_from_string(char* input_str){
             number_len = 0;
             memset(number_buffer, 0, sizeof(number_buffer));
 
-            while (i < input_len && strchr("0123456789", input_str[i])) {
-                number_buffer[number_len++] = input_str[i];
+            while (i < input_len && strchr("0123456789,", input_str[i])) {
+                number_buffer[number_len++] = (input_str[i] == ',') ? '.' : input_str[i];
                 i++;
             }
 
+            char* endptr;
+            temp_number = strtod(number_buffer, &endptr);
+
+            // we are going to increment too much when continuing in loop - decrement here to compensate
+            i--;
             continue;
         }
 
@@ -128,34 +135,35 @@ amount_t* find_amount_from_string(char* input_str){
         /* Handle unit or multiplier keywords */
         if (strcmp(word, "G") == 0 || strcmp(word, "GRAM") == 0) {
             result->unit_type = GRAMS;
-            result->amount = multiplier * atoi(number_buffer);
+            result->amount = multiplier * temp_number;
         }
         else if (strcmp(word, "KG") == 0) {
             result->unit_type = GRAMS;
-            result->amount = multiplier * atoi(number_buffer) * 1000;
+            result->amount = multiplier * temp_number * 1000;
         }
         else if (strcmp(word, "L") == 0 || strcmp(word, "LITER") == 0){
             result->unit_type = LITERS;
-            result->amount = multiplier * atoi(number_buffer);
+            result->amount = multiplier * temp_number;
         }
         else if (strcmp(word, "CL") == 0 || strcmp(word, "CENTILITER") == 0){
             result->unit_type = LITERS;
-            result->amount = multiplier * atoi(number_buffer)/100;
+            result->amount = multiplier * temp_number/100;
+
         }
         else if (strcmp(word, "DL") == 0 || strcmp(word, "DECILITER") == 0){
             result->unit_type = LITERS;
-            result->amount = multiplier * atoi(number_buffer)/10;
+            result->amount = multiplier * temp_number/10;
         }
         else if (strcmp(word, "ML") == 0 || strcmp(word, "MILLILITER") == 0){
             result->unit_type = LITERS;
-            result->amount = multiplier * atoi(number_buffer)/1000;
+            result->amount = multiplier * temp_number/1000;
         }
         else if (strcmp(word, "STK") == 0){
             result->unit_type = PIECES;
-            result->amount = multiplier * atoi(number_buffer);
+            result->amount = multiplier * temp_number;
         }
         else if (strcmp(word, "X") == 0) {
-            multiplier = (double)atoi(number_buffer);
+            multiplier = (double)temp_number;
         }
     }
 

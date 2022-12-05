@@ -37,32 +37,39 @@ int cmp_item_price(item_t **a, item_t **b) {
 }
 
 item_t *find_cheapest_match(store_t *store, char* search_term) {
-    dlist_t *results = calloc(1, sizeof(dlist_t));
+    char* lower_search_term = to_lower(search_term);
+
+    item_t *cheapest = NULL;
     dlist_node_t *item_node = store->items->head;
     while (item_node != NULL) {
+        printf("1 ");
         item_t *item = item_node->data;
-        // TODO: make string comparison case insensitive
-        if (item != NULL) {
-            char* lower_item_name = to_lower(item->name);
-            char* lower_search_term = to_lower(search_term);
-            if (strstr(lower_item_name, lower_search_term) != NULL) {
-                printf(" - %s %.2lf\n", item->name, item->price);
-                dlist_add(results, item);
-            }
-            free(lower_item_name);
-            free(lower_search_term);
+
+        if (item == NULL || item->name == NULL) {
+            item_node = item_node->next;
+            continue;
         }
+        printf("2 ");
+
+        char* lower_item_name = to_lower(item->name);
+        printf("3 ");
+        if (strstr(lower_item_name, lower_search_term) != NULL) {
+            printf(" - %s (%.2lf kr)\n", item->name, item->price);
+            if (cheapest == NULL || cheapest->price > item->price) {
+                cheapest = item;
+            }
+        }
+        printf("4 ");
+        free(lower_item_name);
 
         item_node = item_node->next;
+        printf("5 \n");
     }
-    if (results->count == 0)
-        return NULL;
-    item_t *result[results->count];
-    dlist_fill_array(results, (void **) result);
-    //TODO: radix sort continue
-    //radix_sort(result, results.count);
-    qsort(result, results->count, sizeof(result[0]), (int (*)(const void *, const void *)) cmp_item_price);
-    return result[0];
+    printf("here %d\n", cheapest == NULL);
+
+    free(lower_search_term);
+    printf("also here\n");
+    return cheapest;
 }
 
 // Main Radix Sort, sort function
