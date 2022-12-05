@@ -1,6 +1,15 @@
 #include <stdio.h>
 #include "sorting_functions.h"
+#include "api/coop_api.h"
+#include "store.h"
 #include <string.h>
+#include "store.h"
+#include <stdlib.h>
+#include "api/tjek_api.h"
+#include "sorting_functions.h"
+#include <curl/curl.h>
+#include <locale.h>
+#include <wchar.h>
 
 // This  function gives maximum value in array[]
 int get_max(int item_name[], int n)
@@ -11,6 +20,21 @@ int get_max(int item_name[], int n)
             max = item_name[i];
     }
     return max;
+}
+
+item_t find_cheapest_match(store_t *store, char* search_term) {
+    dlist_t results;
+    // loop
+    dlist_node_t *item_node = store->items->head;
+    while (item_node != NULL) {
+        item_t *item = item_node->data;
+        if (item != NULL && strstr(item->name, search_term) != NULL) {
+            // add to results
+        }
+
+        item_node = item_node->next;
+    }
+    // - match items
 }
 
 // Main Radix Sort, sort function
@@ -24,22 +48,22 @@ void radix_sort(int item_name[], int n)
     //we run loop until we reach the largest digit place
     while(largest_num / digit_place > 0){
 
-        int key_am[10] = {0};
+        int count[10] = {0};
         //Store the amount of keys
         for (i = 0; i < n; i++)
-            key_am[ (item_name[i] / digit_place) % 10]++;
+            count[ (item_name[i] / digit_place) % 10]++;
 
         // Change count[i] so that count[i] now contains actual
         //  position of this digit in result[]
         //  Working similar to the counting sort algorithm
         for (i = 1; i < 10; i++)
-            key_am[i] += key_am[i - 1];
+            count[i] += count[i - 1];
 
         // Build the resulting array
         for (i = n - 1; i >= 0; i--)
         {
-            result[key_am[(item_name[i] / digit_place) % 10 ] - 1] = item_name[i];
-            key_am[ (item_name[i] / digit_place) % 10 ]--;
+            result[count[(item_name[i] / digit_place) % 10 ] - 1] = item_name[i];
+            count[ (item_name[i] / digit_place) % 10 ]--;
         }
 
         // Now main array item_sort[] contains sorted
@@ -55,14 +79,9 @@ void radix_sort(int item_name[], int n)
 // Function to print array "item_name"
 void print_array(int item_name[])
 {
-    printf(" %d", item_name[0]);
 }
 
 int cheapest_price (int item_name[], int n)
 {
-    varer item;
-
-    printf("");
-
 
 }

@@ -4,24 +4,6 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-enum AmountUnit {
-    GRAMS,
-    LITERS,
-    PIECES
-};
-
-typedef enum AmountUnit quantity_type;
-
-typedef struct{
-double pris;
-char* navn;
-bool is_bargain;
-char* EAN;
-quantity_type unit;
-double quantity_amount;
-bool is_ecological;
-}varer;
-
 
 int get_max(int item_name[], int n);
 
