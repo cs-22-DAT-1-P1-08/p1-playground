@@ -24,7 +24,7 @@ int main() {
 }
 
 void print_products(store_t *store) {
-    dlist_node_t *item_node = store->products->head;
+    dlist_node_t *item_node = store->items->head;
     while (item_node != NULL) {
         item_t *item = item_node->data;
         if (item == NULL)
@@ -68,7 +68,7 @@ void tjek_api_temp() {
 
     catalog_offers_t *catalog_offers = get_catalog_offers(db_catalog_info);
 
-    dlist_node_t *offer_node = catalog_offers->offers->head;
+    dlist_node_t *offer_node = catalog_offers->items->head;
     while (offer_node != NULL) {
         offer_t *offer = (offer_t*)offer_node->data;
         if (offer->group == NULL) {

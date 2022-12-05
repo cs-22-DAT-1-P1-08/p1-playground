@@ -11,7 +11,7 @@ enum StoreType {
 
 typedef struct store_t {
     catalog_offers_t* offers;
-    dlist_t* products;
+    dlist_t* items;
     catalog_info_t* catalog_info;
 } store_t;
 

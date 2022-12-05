@@ -43,7 +43,7 @@ typedef struct offer_t {
  */
 typedef struct catalog_offers_t {
     dlist_t *offer_groups;
-    dlist_t *offers;
+    dlist_t *items;
 } catalog_offers_t;
 
 /**
