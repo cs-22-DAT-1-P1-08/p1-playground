@@ -74,4 +74,11 @@ void dlist_free(dlist_t *dlist);
  */
 void dlist_free_all(dlist_t *dlist, void free_node_data(void* node_data));
 
+/**
+ * Fills pre-allocated array with data from list
+ * @param dlist Doubly linked list
+ * @param out_array array to be filled
+ */
+void dlist_fill_array(dlist_t *dlist, void *out_array[]);
+
 #endif
