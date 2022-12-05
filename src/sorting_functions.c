@@ -11,6 +11,15 @@
 #include <locale.h>
 #include <wchar.h>
 
+char* to_lower(char *str) {
+    int len = (int)strlen(str);
+    char* result = calloc(len + 1, sizeof(char));
+    for (int i = 0; i < len; i++){
+        result[i] = tolower(str[i]);
+    }
+    return result;
+}
+
 // This  function gives maximum value in array[]
 int get_max(int item_name[], int n)
 {
@@ -22,29 +31,37 @@ int get_max(int item_name[], int n)
     return max;
 }
 
-int cmp_item_price(item_t *a, item_t *b) {
+int cmp_item_price(item_t **a, item_t **b) {
     // TODO: Include offer prices
-    return (int)(a->price - b->price);
+    return (int)((*a)->price - (*b)->price);
 }
 
 item_t *find_cheapest_match(store_t *store, char* search_term) {
-    dlist_t results;
+    dlist_t *results = calloc(1, sizeof(dlist_t));
     dlist_node_t *item_node = store->items->head;
     while (item_node != NULL) {
         item_t *item = item_node->data;
         // TODO: make string comparison case insensitive
-        if (item != NULL && strstr(item->name, search_term) != NULL) {
-            // add to results
-            dlist_add(&results, item);
+        if (item != NULL) {
+            char* lower_item_name = to_lower(item->name);
+            char* lower_search_term = to_lower(search_term);
+            if (strstr(lower_item_name, lower_search_term) != NULL) {
+                printf(" - %s %.2lf\n", item->name, item->price);
+                dlist_add(results, item);
+            }
+            free(lower_item_name);
+            free(lower_search_term);
         }
 
         item_node = item_node->next;
     }
-    item_t *result[results.count];
-    dlist_fill_array(&results, (void **) result);
+    if (results->count == 0)
+        return NULL;
+    item_t *result[results->count];
+    dlist_fill_array(results, (void **) result);
     //TODO: radix sort continue
     //radix_sort(result, results.count);
-    qsort(result, results.count, sizeof(result[0]), cmp_item_price);
+    qsort(result, results->count, sizeof(result[0]), (int (*)(const void *, const void *)) cmp_item_price);
     return result[0];
 }
 

@@ -8,8 +8,10 @@ store_t link_offer_data(store_t* store) {
     dlist_node_t *item_node = store->items->head;
     while (item_node != NULL) {
         item_t *item = item_node->data;
-        if (item == NULL)
+        if (item == NULL) {
+            item_node = item_node->next;
             continue;
+        }
 
         dlist_node_t *offer_node = store->offers->items->head;
         while (offer_node != NULL) {

@@ -1,33 +1,28 @@
 #include <stdio.h>
 #include "api/coop_api.h"
 #include "store.h"
-#include <stdlib.h>
 #include "api/tjek_api.h"
 #include "sorting_functions.h"
 #include <curl/curl.h>
-#include <locale.h>
-#include <wchar.h>
 
 void print_products(store_t *store);
 void coop_api_temp(void);
 void tjek_api_temp();
 void sorting_temp();
+void search_prototype(store_t *daglibrugsen, store_t *coop365);
 
 int main() {
-    //sorting_temp();
-
     printf("Started program...\n");
     store_t *daglibrugsen = get_coop_store("1290", DB_DEALER_ID);
     store_t *coop365 = get_coop_store("24165", COOP365_DEALER_ID);
-    radix_sort(daglibrugsen->items, );
+
     print_products(daglibrugsen);
+    //search_prototype(daglibrugsen, coop365);
 
     free_store(daglibrugsen);
     free_store(coop365);
     return 0;
 }
-
-
 
 void print_products(store_t *store) {
     dlist_node_t *item_node = store->items->head;
@@ -45,6 +40,24 @@ void print_products(store_t *store) {
 
         item_node = item_node->next;
     }
+}
+
+void search_prototype(store_t *daglibrugsen, store_t *coop365) {
+    char temp_search_term[100] = "";
+    printf("Enter search term: ");
+    scanf("%s", temp_search_term);
+
+    printf("\n------------------------\n");
+    printf("Searching for %s: \n", temp_search_term);
+    item_t *db_cheapest = find_cheapest_match(daglibrugsen, temp_search_term);
+    if (db_cheapest != NULL)
+        printf("Dagli'Brugsen: %s (%.2lf kr)\n", db_cheapest->name, db_cheapest->price);
+    else printf("Dagli'Brugsen: Not found");
+
+    item_t *cheapest365 = find_cheapest_match(coop365, temp_search_term);
+    if (db_cheapest != NULL)
+        printf("Coop 365: %s (%.2lf kr)\n", cheapest365->name, cheapest365->price);
+    else printf("Coop 365: Not found");
 }
 
 void coop_api_temp(void) {
