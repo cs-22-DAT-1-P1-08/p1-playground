@@ -88,7 +88,7 @@ void fill_geocode(geocode *place, char *str, int item_num){
 
 //https://browse.search.hereapi.com/v1/browse?at=57.04074,9.95146&categories=600-6300-0066,800-8500-0178&name=rema 1000&apiKey=4nt5IVcSUaha7lK7Bx8f3PagaNfgP6QRyEYF3ZOMksA
 void store_to_geo(geocode *store, char* apikey, char *lat, char *lng) {
-    char url[200] = "https://browse.search.hereapi.com/v1/browse?";
+    char url[1000] = "https://browse.search.hereapi.com/v1/browse?";
     add_if_api(url, apikey);
     add_strings(url, 6, "at=", lat, ",", lng, "&categories=600-6300-0066&name=", store->place_name);
     char *str = malloc(sizeof(char) * 100000);
@@ -133,7 +133,6 @@ int *route_time(geocode *places, char *transportation, char *apikey, size_t plac
         add_strings(url, 6, places[i].place_name, ";", places[i].lat, ",", places[i].lng, "&");
     }
     add_strings(url, 2,"improveFor=time&mode=fastest;", transportation);
-
     char *str = malloc(sizeof(char) * 100000);
     api_to_str(url, "https", str);
 

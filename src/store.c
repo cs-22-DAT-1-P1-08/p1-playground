@@ -3,6 +3,8 @@
 #include <string.h>
 #include "api/coop_api.h"
 #include "api/tjek_api.h"
+#include "api/location_api.h"
+#include "curl/curl.h"
 
 store_t link_offer_data(store_t* store) {
     dlist_node_t *item_node = store->products->head;
@@ -45,12 +47,28 @@ store_t* get_coop_store(char* store_name, char* store_id, char* dealer_id) {
     return store;
 }
 
+void fill_nearest_store(store_t *store, geocode *home) {
+    if (store->location == NULL) {
+        store->location = malloc(sizeof(geocode));
+    }
+
+    initialize_geocode(store->location);
+
+    char* escaped_name = curl_escape(store->name, strlen(store->name));
+    strcpy(store->location->place_name, escaped_name);
+    strcpy(store->location->city, home->city);
+    curl_free(escaped_name);
+}
+
 void free_store(store_t *store) {
     if (store == NULL)
         return;
 
     if (store->name != NULL)
         free(store->name);
+
+    if (store->location != NULL)
+        free(store->location);
 
     if (store->catalog_info != NULL)
         free_catalog_info(store->catalog_info);
