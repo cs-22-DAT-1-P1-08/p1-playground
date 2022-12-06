@@ -1,4 +1,4 @@
-#include "api.h"
+#include "api/location_api.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include "store.h"

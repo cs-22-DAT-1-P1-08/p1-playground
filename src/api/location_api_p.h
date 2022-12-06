@@ -1,7 +1,7 @@
-#ifndef P1_PLAYGROUND_API_P_H
-#define P1_PLAYGROUND_API_P_H
+#ifndef P1_PLAYGROUND_LOCATION_API_P_H
+#define P1_PLAYGROUND_LOCATION_API_P_H
 
-#include "api.h"
+#include "location_api.h"
 
 typedef struct {
     char *memory;
@@ -68,4 +68,4 @@ void set_address (geocode *place, AddressComponent i, char *str);
 
 
 
-#endif //P1_PLAYGROUND_API_P_H
+#endif //P1_PLAYGROUND_LOCATION_API_P_H

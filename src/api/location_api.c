@@ -1,9 +1,9 @@
-#include "api.h"
-#include "api_p.h"
+#include "location_api.h"
+#include "location_api_p.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <curl/curl.h>
+#include "curl/curl.h"
 #include <stdarg.h>
 #include <json-c/json.h>
 
