@@ -6,14 +6,10 @@
 #include "api/coop_api.h"
 #include "store.h"
 
+int cmp_item_price(item_t *a, item_t *b);
 
-int get_max(int item_name[], int n);
+item_t find_cheapest_match(store_t *store, char* search_term);
 
-void radix_sort(int item_name[], int n);
-
-item_t *find_cheapest_match(store_t *store, char* search_term);
-
-void print_array(int item_name[]);
 
 #ifndef P1_PLAYGROUND_SORTING_FUNCTIONS_H
 #define P1_PLAYGROUND_SORTING_FUNCTIONS_H
