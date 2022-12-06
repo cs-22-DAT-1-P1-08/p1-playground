@@ -25,18 +25,32 @@ store_t link_offer_data(store_t* store) {
     }
 }
 
-store_t* get_coop_store(char* store_id, char* dealer_id) {
+store_t* get_coop_store(char* store_name, char* store_id, char* dealer_id) {
     store_t *store = calloc(1, sizeof(store_t));
+
+    /* Fill store name */
+    store->name = calloc(strlen(store_name) + 1, sizeof(char));
+    strcpy(store->name, store_name);
+
+    /* Fill assortment data from Coop API */
     store->items = coop_get_items(store_id);
+
+    /* Fill offer data from Tjek API */
     store->catalog_info = get_catalog_info(dealer_id);
     store->offers = get_catalog_offers(store->catalog_info);
+
+    /* Link product and offer data */
     link_offer_data(store);
+
     return store;
 }
 
 void free_store(store_t *store) {
     if (store == NULL)
         return;
+
+    if (store->name != NULL)
+        free(store->name);
 
     if (store->catalog_info != NULL)
         free_catalog_info(store->catalog_info);

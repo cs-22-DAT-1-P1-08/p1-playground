@@ -9,8 +9,8 @@
 
 int main() {
     printf("Started program...\n");
-    store_t *daglibrugsen = get_coop_store("1290", DB_DEALER_ID);
-    store_t *coop365 = get_coop_store("24165", COOP365_DEALER_ID);
+    store_t *daglibrugsen = get_coop_store("Dagli'Brugsen", "1290", DB_DEALER_ID);
+    store_t *coop365 = get_coop_store("Coop 365", "24165", COOP365_DEALER_ID);
 
     // Grænseflade implementation
     printf("%s: %lf", find_cheapest_match(daglibrugsen, "TUBORG").name,find_cheapest_match(daglibrugsen, "TUBORG").price);
