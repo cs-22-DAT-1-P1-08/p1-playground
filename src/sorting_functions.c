@@ -14,7 +14,7 @@ int cmp_item_price(item_t *a, item_t *b) {
 
 item_t find_cheapest_match(store_t *store, char* search_term) {
     item_t results;
-    dlist_node_t *item_node = store->items->head;
+    dlist_node_t *item_node = store->products->head;
     while (item_node != NULL) {
         item_t *item = item_node->data;
         // TODO: make string comparison case insensitive

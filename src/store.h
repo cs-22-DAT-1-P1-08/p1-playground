@@ -12,7 +12,7 @@ enum StoreType {
 typedef struct store_t {
     char* name;
     catalog_offers_t* offers;
-    dlist_t* items;
+    dlist_t* products;
     catalog_info_t* catalog_info;
 } store_t;
 
