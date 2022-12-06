@@ -1,5 +1,15 @@
-add_library(my_api api.c api.h)
-target_link_libraries(my_api json-c::json-c pdcurses::pdcurses ${libcurl_LIBRARY})
+set(SOURCES
+    ${SOURCES}
+    ${CMAKE_CURRENT_LIST_DIR}/main.c
+    ${CMAKE_CURRENT_LIST_DIR}/store.c
+    ${CMAKE_CURRENT_LIST_DIR}/sorting_functions.c
+    ${CMAKE_CURRENT_LIST_DIR}/api.c
+    ${CMAKE_CURRENT_LIST_DIR}/api/tjek_api.c
+    ${CMAKE_CURRENT_LIST_DIR}/api/coop_api.c
+    ${CMAKE_CURRENT_LIST_DIR}/util/curlext.c
+    ${CMAKE_CURRENT_LIST_DIR}/util/dlist.c
+        )
 
-add_executable(location main.c api_p.h)
-target_link_libraries(location my_api json-c::json-c pdcurses::pdcurses ${libcurl_LIBRARY})
+add_executable(p1_playground main.c)
+target_sources(p1_playground PRIVATE ${SOURCES})
+target_link_libraries(p1_playground json-c::json-c pdcurses::pdcurses ${libcurl_LIBRARY})
