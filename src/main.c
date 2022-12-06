@@ -1,7 +1,11 @@
+#include "api.h"
+#include <stdlib.h>
 #include <stdio.h>
 #include "store.h"
 #include "api/tjek_api.h"
 #include "sorting_functions.h"
+#include <curl/curl.h>
+#include <json-c/json.h>
 
 int main() {
     printf("Started program...\n");
