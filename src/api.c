@@ -106,14 +106,55 @@ void store_to_geo(location *store, char* apikey, char *lat, char *lng) {
     free(str);
 }
 
+int sum_of_arr(int arr[], size_t arr_len) {
+    int sum = 0;
+    for (int i = 1; i < arr_len; ++i) {
+        sum += arr[i];
+    }
+    return sum;
+}
+int *json_to_traveltime(json_object *jobj, location* places, size_t places_len) {
+    int *travel_time = malloc(sizeof(int) * places_len);
+
+    // Searches through the json both through elements and the 1st and only route in routes
+    json_object *routes = json_object_object_get(jobj, "routes");
+    json_object *route = json_object_array_get_idx(routes, 0);
+    json_object *sections = json_object_object_get(route, "sections");
+
+    // Iterate through the different elements in section in the json_object and finds the duration
+    for (int i = 1; i < places_len; ++i) {
+        json_object *section = json_object_array_get_idx(sections, i - 1);
+        json_object *summary = json_object_object_get(section, "travelSummary");
+        travel_time[i] = json_object_get_int(json_object_object_get(summary, "duration"));
+
+        json_object *arrival = json_object_object_get(section, "arrival");
+        json_object *place = json_object_object_get(arrival, "place");
+        json_object *orgloca = json_object_object_get(place, "originalLocation");
+
+        // gets the latitude and longtitude of the current element in the json object and finds the location in places it
+        // corresponds to, so that the location can get its dest_on_route set.
+        const char *lat = json_object_get_string(json_object_object_get(orgloca, "lat"));
+        const char *lng = json_object_get_string(json_object_object_get(orgloca, "lng"));
+        for (int j = 0; j < places_len; ++j) {
+            if (strncmp(lng, places[j].lng, 7) == 0 && strncmp(lat, places[j].lat, 7) == 0) {
+                places[j].dest_on_route = i;
+            }
+        }
+    }
+    return travel_time;
+}
 int *route_time(location *places, char *transportation, char *apikey, size_t places_len) {
     char url[1000] = "https://router.hereapi.com/v8/routes?";
     add_if_api(url, apikey);
+
+    // Checks if the locations in places isn't entirely empty, else the prgram is stopped
     for (int i = 0; i < places_len; ++i) {
         if (is_addr_empty(&places[i])) {
             printf("ERROR an address was entirely empty");
             exit(EXIT_FAILURE);
         }
+
+        // calls are made so the missing information in all the location in places are filled
         else if (strcmp(places[i].place_name, places[0].place_name) == 0);
         else if (strncmp("home", places[i].place_name, 4)== 0) addr_to_geo(&places[i], apikey);
         else store_to_geo(&places[i], apikey, places[0].lat, places[0].lng);
@@ -131,43 +172,15 @@ int *route_time(location *places, char *transportation, char *apikey, size_t pla
 
     char *str = curlext_easy_fetch(url, "https");
 
-    int *travel_time = malloc(sizeof (int) *places_len);
-
+    // Convets str to json_object
     json_object *jobj = json_tokener_parse(str);
 
-    //
-    json_object *routes = json_object_object_get(jobj, "routes");
-    json_object *route = json_object_array_get_idx(routes, 0);
-    json_object *sections = json_object_object_get(route, "sections");
+    int *time_arr = json_to_traveltime(jobj, places, places_len);
 
-    //
-    for (int i = 1; i < places_len; ++i) {
-        json_object *section = json_object_array_get_idx(sections, i-1);
-        json_object *summary = json_object_object_get(section, "travelSummary");
-        travel_time[i] = json_object_get_int(json_object_object_get(summary, "duration"));
-
-        json_object *arrival = json_object_object_get(section, "arrival");
-        json_object *place   = json_object_object_get(arrival, "place");
-        json_object *orgloca = json_object_object_get(place, "originalLocation");
-
-        // gets the result
-        const char* lat = json_object_get_string(json_object_object_get(orgloca, "lat"));
-        const char* lng = json_object_get_string(json_object_object_get(orgloca, "lng"));
-        for (int j = 0; j < places_len; ++j) {
-            if (strncmp(lng, places[j].lng, 7) == 0 && strncmp(lat, places[j].lat, 7) == 0) {
-                places[j].dest_on_route = i;
-            }
-        }
-    }
-
-    //
-    travel_time[0] = 0;
-    for (int i = 1; i < places_len; ++i) {
-        travel_time[0] += travel_time[i];
-    }
+    time_arr[0] = 0;
+    time_arr[0] = sum_of_arr(time_arr, places_len);
     free(str);
-return travel_time;
-
+    return time_arr;
 }
 
 void initialize_location(location *place) {
