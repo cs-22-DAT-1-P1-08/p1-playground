@@ -3,21 +3,6 @@
 
 #include "api.h"
 
-typedef struct {
-    char *memory;
-    size_t size;
-} MemoryStruct;
-
-
-/**
- * Uses libcurl to make get request through a passed url, the output of the request is through a helping function
- * WriteMemoryCallback to take the output and copy it into a string
- * @param url a string with the url which libcurl is to make a request with.
- * @param protocol the protocol for which the site utilize.
- * @param str_dest the string which the output of the get request is parsed to.
- */
-void api_to_str(char *url, char *protocol, char *str_dest);
-
 /**
  * Uses strarg library to add unlimited arguments to str_dest
  * @param str_dest the string which is added to

@@ -6,6 +6,7 @@
 #include <curl/curl.h>
 #include <stdarg.h>
 #include <json-c/json.h>
+#include "util/curlext.h"
 
 void add_strings(char *str_dest, int args,...) {
     va_list valist;
@@ -58,8 +59,7 @@ void addr_to_geo(geocode *place, char* apikey) {
     strcat(url, "q=");
     add_geocode_to_url(place, url, &str_for_url);
 
-    char *str = malloc(sizeof(char) * 10000);
-    api_to_str(url, "https", str);
+    char *str = curlext_easy_fetch(url, "https");
     fill_geocode(place, str, 0);
     free(str);
 }
@@ -91,131 +91,83 @@ void store_to_geo(geocode *store, char* apikey, char *lat, char *lng) {
     char url[200] = "https://browse.search.hereapi.com/v1/browse?";
     add_if_api(url, apikey);
     add_strings(url, 6, "at=", lat, ",", lng, "&categories=600-6300-0066&name=", store->place_name);
-    char *str = malloc(sizeof(char) * 100000);
-    api_to_str(url, "https", str);
+    char *str = curlext_easy_fetch(url, "https");
     int i;
     json_object *find_payment = NULL;
     json_object *items = json_tokener_parse(str);
     items = json_object_object_get(items, "items");
     for ( i = 0; i < json_object_array_length(items); ++i) {
-
         find_payment = json_object_array_get_idx(items, i);
         find_payment = json_object_object_get(find_payment, "payment");
         if (find_payment != NULL) break;
-
     }
-    fill_geocode(store, str , i);
+    if (find_payment == NULL) printf("ERROR Store is not a store");
+    fill_geocode(store, str, i);
     free(str);
 }
 
 int *route_time(geocode *places, char *transportation, char *apikey, size_t places_len) {
-    char url[1000] = "https://wps.hereapi.com/2/findsequence.json?";
+    char url[1000] = "https://router.hereapi.com/v8/routes?";
     add_if_api(url, apikey);
     for (int i = 0; i < places_len; ++i) {
         if (is_addr_empty(&places[i])) {
             printf("ERROR an address was entirely empty");
             exit(EXIT_FAILURE);
         }
-        else if (strncmp("home",places[i].place_name,4)== 0) addr_to_geo(&places[i], apikey);
+        else if (strcmp(places[i].place_name, places[0].place_name) == 0);
+        else if (strncmp("home", places[i].place_name, 4)== 0) addr_to_geo(&places[i], apikey);
         else store_to_geo(&places[i], apikey, places[0].lat, places[0].lng);
-
     }
     for (int i = 0; i < places_len; ++i) {
-        if (i == 0) strcat(url, "start=");
-        else if (i == places_len - 1) strcat(url, "end=");
+        if (i == 0) strcat(url, "origin=");
+        else if (i == places_len - 1) strcat(url, "destination=");
         else {
-            strcat(url, "destination");
-            char arr_numb[5];
-            itoa(i, arr_numb, 10);
-            strcat(url, arr_numb);
+            strcat(url, "via");
             strcat(url, "=");
         }
-        add_strings(url, 6, places[i].place_name, ";", places[i].lat, ",", places[i].lng, "&");
+        add_strings(url, 4, places[i].lat, ",", places[i].lng, "&");
     }
-    add_strings(url, 2,"improveFor=time&mode=fastest;", transportation);
+    add_strings(url, 2,"return=travelSummary&transportMode=", transportation);
 
-    char *str = malloc(sizeof(char) * 100000);
-    api_to_str(url, "https", str);
+    char *str = curlext_easy_fetch(url, "https");
 
     int *travel_time = malloc(sizeof (int) *places_len);
-    json_object *jjobj = json_tokener_parse(str);
-    json_object *results = json_object_object_get(jjobj, "results");
-    json_object *result = json_object_array_get_idx(results, 0);
-    travel_time[0] = json_object_get_int(json_object_object_get(result, "time"));
-    json_object *interconnections = json_object_object_get(result, "interconnections");
-    for (int i = 1; i < places_len; ++i) {
 
-        json_object *interconnection = json_object_array_get_idx(interconnections, i-1);
-        travel_time[i] = json_object_get_int(json_object_object_get(interconnection, "time"));
+    json_object *jobj = json_tokener_parse(str);
+
+    //
+    json_object *routes = json_object_object_get(jobj, "routes");
+    json_object *route = json_object_array_get_idx(routes, 0);
+    json_object *sections = json_object_object_get(route, "sections");
+
+    //
+    for (int i = 1; i < places_len; ++i) {
+        json_object *section = json_object_array_get_idx(sections, i-1);
+        json_object *summary = json_object_object_get(section, "travelSummary");
+        travel_time[i] = json_object_get_int(json_object_object_get(summary, "duration"));
+
+        json_object *arrival = json_object_object_get(section, "arrival");
+        json_object *place   = json_object_object_get(arrival, "place");
+        json_object *orgloca = json_object_object_get(place, "originalLocation");
+
+        // gets the result
+        const char* lat = json_object_get_string(json_object_object_get(orgloca, "lat"));
+        const char* lng = json_object_get_string(json_object_object_get(orgloca, "lng"));
+        for (int j = 0; j < places_len; ++j) {
+            if (strncmp(lng, places[j].lng, 7) == 0 && strncmp(lat, places[j].lat, 7) == 0) {
+                places[j].dest_on_route = i;
+            }
+        }
+    }
+
+    //
+    travel_time[0] = 0;
+    for (int i = 1; i < places_len; ++i) {
+        travel_time[0] += travel_time[i];
     }
     free(str);
 return travel_time;
 
-}
-
-//https://curl.se/libcurl/c/getinmemory.html
-
-static size_t WriteMemoryCallback(void *contents, size_t size, size_t nmemb, void *userp) {
-    size_t realsize = size * nmemb;
-    MemoryStruct *mem = (MemoryStruct *)userp;
-
-    char *ptr = realloc(mem->memory, mem->size + realsize + 1);
-    if(!ptr) {
-        /* out of memory! */
-        printf("not enough memory (realloc returned NULL)\n");
-        return 0;
-    }
-
-    mem->memory = ptr;
-    memcpy(&(mem->memory[mem->size]), contents, realsize);
-    mem->size += realsize;
-    mem->memory[mem->size] = 0;
-
-    return realsize;
-}
-
-
-void api_to_str(char *url, char *protocol, char *str_dest) {
-    CURL *curl;
-    CURLcode res;
-
-    MemoryStruct chunk;
-    chunk.memory = malloc(1);  /* will be grown as needed by the realloc above */
-    chunk.size = 0;    /* no data at this point */
-
-    curl_global_init(CURL_GLOBAL_ALL);
-    /* init the curl session */
-    curl = curl_easy_init();
-
-    /* specify URL to get */
-    if (!curl) {
-        fprintf(stderr,"[-] Failed Initializing Curl\n");
-        exit(-1);
-    }
-    curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "GET");
-    curl_easy_setopt(curl, CURLOPT_URL, url);
-    curl_easy_setopt(curl, CURLOPT_DEFAULT_PROTOCOL, protocol);
-    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteMemoryCallback);
-    /* we pass our 'chunk' struct to the callback function */
-    curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)&chunk);
-    /* disables SSL security, very bad, but as of know we got no clue how to fix our SSL or SSH problem*/
-    curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);
-    res = curl_easy_perform(curl);
-
-    clrscr();
-
-    if (res != CURLE_OK) {
-        fprintf(stderr,"[-] Could Not Fetch Webpage\n[+] Error : %s\n",curl_easy_strerror(res));
-        exit(-2);
-    }
-    str_dest = realloc(str_dest, sizeof(char) * chunk.size);
-    strcpy(str_dest, (char *)chunk.memory);
-
-    /* cleanup curl stuff */
-    curl_easy_cleanup(curl);
-    free(chunk.memory);
-    /* we are done with libcurl, so clean it up */
-    curl_global_cleanup();
 }
 
 void initialize_geocode(geocode *place) {
@@ -247,6 +199,7 @@ char *get_address(geocode *place, AddressComponent i) {
             exit(0);
     }
 }
+
 void set_address(geocode *place, AddressComponent i, char *str){
     switch (i) {
         case STREET:

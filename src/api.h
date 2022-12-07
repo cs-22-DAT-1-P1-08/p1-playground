@@ -27,6 +27,8 @@ typedef struct {
     char state[18], county[32], city[25], street[37], postalCode[5], houseNumber[5];
     //Geo coordinates
     char lat[9], lng[9];
+    //Distance from user
+    int dest_on_route;
     //Place name
     char place_name[20];
 } geocode;
