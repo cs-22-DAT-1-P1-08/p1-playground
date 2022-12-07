@@ -29,7 +29,7 @@ void str_for_url(char* url, char* temp, int empty) {
     strcat(url, temp);
 }
 
-void add_location_to_url(location *place, char* url, void f(char *, char *, int)) {
+void add_location_to_url(location_t *place, char* url, void f(char *, char *, int)) {
     char temp[100];
     int empty = 1;
     for (int i = 0; i < 6; ++i) {
@@ -41,7 +41,7 @@ void add_location_to_url(location *place, char* url, void f(char *, char *, int)
     }
 }
 
-int is_addr_empty(location *place) {
+int is_addr_empty(location_t *place) {
     char temp[100];
     int empty = 1;
     for (int i = 0; i < 6; ++i) {
@@ -53,7 +53,7 @@ int is_addr_empty(location *place) {
     return empty;
 }
 
-void addr_to_geo(location *place, char* apikey) {
+void addr_to_geo(location_t *place, char* apikey) {
     char url[200] = "https://geocode.search.hereapi.com/v1/geocode?";
     add_if_api(url, apikey);
     strcat(url, "q=");
@@ -64,7 +64,7 @@ void addr_to_geo(location *place, char* apikey) {
     free(str);
 }
 
-void replace_address(location *place, json_object *address, int args,...) {
+void replace_address(location_t *place, json_object *address, int args,...) {
     va_list valist;
     va_start(valist, args);
     for (int i = 0; i < args; ++i) {
@@ -75,7 +75,7 @@ void replace_address(location *place, json_object *address, int args,...) {
     va_end(valist);
 }
 
-void fill_location(location *place, char *str, int item_num){
+void fill_location(location_t *place, char *str, int item_num){
     json_object *jobj =json_tokener_parse(str);
     json_object *items = json_object_object_get(jobj, "items");
     json_object *item = json_object_array_get_idx(items, item_num);
@@ -87,7 +87,7 @@ void fill_location(location *place, char *str, int item_num){
 }
 
 //https://browse.search.hereapi.com/v1/browse?at=57.04074,9.95146&categories=600-6300-0066,800-8500-0178&name=rema 1000&apiKey=4nt5IVcSUaha7lK7Bx8f3PagaNfgP6QRyEYF3ZOMksA
-void store_to_geo(location *store, char* apikey, char *lat, char *lng) {
+void store_to_geo(location_t *store, char* apikey, char *lat, char *lng) {
     char url[200] = "https://browse.search.hereapi.com/v1/browse?";
     add_if_api(url, apikey);
     add_strings(url, 6, "at=", lat, ",", lng, "&categories=600-6300-0066&name=", store->place_name);
@@ -113,7 +113,7 @@ int sum_of_arr(int arr[], size_t arr_len) {
     }
     return sum;
 }
-int *json_to_traveltime(json_object *jobj, location* places, size_t places_len) {
+int *json_to_traveltime(json_object *jobj, location_t* places, size_t places_len) {
     int *travel_time = malloc(sizeof(int) * places_len);
 
     // Searches through the json both through elements and the 1st and only route in routes
@@ -131,8 +131,8 @@ int *json_to_traveltime(json_object *jobj, location* places, size_t places_len) 
         json_object *place = json_object_object_get(arrival, "place");
         json_object *orgloca = json_object_object_get(place, "originalLocation");
 
-        // gets the latitude and longtitude of the current element in the json object and finds the location in places it
-        // corresponds to, so that the location can get its dest_on_route set.
+        // gets the latitude and longtitude of the current element in the json object and finds the location_t in places it
+        // corresponds to, so that the location_t can get its dest_on_route set.
         const char *lat = json_object_get_string(json_object_object_get(orgloca, "lat"));
         const char *lng = json_object_get_string(json_object_object_get(orgloca, "lng"));
         for (int j = 0; j < places_len; ++j) {
@@ -143,7 +143,8 @@ int *json_to_traveltime(json_object *jobj, location* places, size_t places_len) 
     }
     return travel_time;
 }
-int *route_time(location *places, char *transportation, char *apikey, size_t places_len) {
+
+int *route_time(location_t *places, char *transportation, char *apikey, size_t places_len) {
     char url[1000] = "https://router.hereapi.com/v8/routes?";
     add_if_api(url, apikey);
 
@@ -183,7 +184,7 @@ int *route_time(location *places, char *transportation, char *apikey, size_t pla
     return time_arr;
 }
 
-void initialize_location(location *place) {
+void initialize_location(location_t *place) {
     strcpy(place->postalCode, "");
     strcpy(place->city,       "");
     strcpy(place->houseNumber,"");
@@ -199,7 +200,7 @@ void clrscr() {
     system("@cls||clear");
 }
 
-char *get_address(location *place, AddressComponent i) {
+char *get_address(location_t *place, AddressComponent i) {
     switch(i) {
         case STREET:        return place->street;
         case HOUSE_NUMBER:  return place->houseNumber;
@@ -213,7 +214,7 @@ char *get_address(location *place, AddressComponent i) {
     }
 }
 
-void set_address(location *place, AddressComponent i, char *str){
+void set_address(location_t *place, AddressComponent i, char *str){
     switch (i) {
         case STREET:
             strcpy(place->street, str);

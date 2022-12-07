@@ -7,7 +7,7 @@
 int main() {
     char apikey[100];
     scanf("%s", apikey);
-    location hjem;
+    location_t hjem;
     initialize_location(&hjem);
     strcpy(hjem.street, "Hadsundvej");
     strcpy(hjem.houseNumber, "44");
@@ -15,7 +15,7 @@ int main() {
     strcpy(hjem.place_name, "home");
     addr_to_geo(&hjem, apikey);
 
-    location spar;
+    location_t spar;
     initialize_location(&spar);
     strcpy(spar.place_name, "rema");
     strcpy(spar.city, hjem.city);
@@ -24,7 +24,7 @@ int main() {
     //for (int i = 0; i < 6; ++i) {
     //    printf("\n%s", get_address(&spar, i));
     //}
-    location places[] = {hjem, spar, hjem};
+    location_t places[] = {hjem, spar, hjem};
     int *arr = route_time(places, "bicycle", apikey, 3);
 
     printf("entire route duration: %d", arr[0]);
@@ -39,7 +39,7 @@ int main() {
         printf("\n\n%s %d",temp_dest_name, arr[i]);
     }
     /*
-    location hulla;
+    location_t hulla;
     initialize_location(&hulla);
     strcpy(hulla.street, "Hadsundvej");
     strcpy(hulla.houseNumber, "44");
