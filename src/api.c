@@ -29,7 +29,7 @@ void str_for_url(char* url, char* temp, int empty) {
     strcat(url, temp);
 }
 
-void add_geocode_to_url(geocode *place, char* url, void f(char *, char *, int)) {
+void add_location_to_url(location *place, char* url, void f(char *, char *, int)) {
     char temp[100];
     int empty = 1;
     for (int i = 0; i < 6; ++i) {
@@ -41,7 +41,7 @@ void add_geocode_to_url(geocode *place, char* url, void f(char *, char *, int)) 
     }
 }
 
-int is_addr_empty(geocode *place) {
+int is_addr_empty(location *place) {
     char temp[100];
     int empty = 1;
     for (int i = 0; i < 6; ++i) {
@@ -53,18 +53,18 @@ int is_addr_empty(geocode *place) {
     return empty;
 }
 
-void addr_to_geo(geocode *place, char* apikey) {
+void addr_to_geo(location *place, char* apikey) {
     char url[200] = "https://geocode.search.hereapi.com/v1/geocode?";
     add_if_api(url, apikey);
     strcat(url, "q=");
-    add_geocode_to_url(place, url, &str_for_url);
+    add_location_to_url(place, url, &str_for_url);
 
     char *str = curlext_easy_fetch(url, "https");
-    fill_geocode(place, str, 0);
+    fill_location(place, str, 0);
     free(str);
 }
 
-void replace_address(geocode *place, json_object *address, int args,...) {
+void replace_address(location *place, json_object *address, int args,...) {
     va_list valist;
     va_start(valist, args);
     for (int i = 0; i < args; ++i) {
@@ -75,7 +75,7 @@ void replace_address(geocode *place, json_object *address, int args,...) {
     va_end(valist);
 }
 
-void fill_geocode(geocode *place, char *str, int item_num){
+void fill_location(location *place, char *str, int item_num){
     json_object *jobj =json_tokener_parse(str);
     json_object *items = json_object_object_get(jobj, "items");
     json_object *item = json_object_array_get_idx(items, item_num);
@@ -87,7 +87,7 @@ void fill_geocode(geocode *place, char *str, int item_num){
 }
 
 //https://browse.search.hereapi.com/v1/browse?at=57.04074,9.95146&categories=600-6300-0066,800-8500-0178&name=rema 1000&apiKey=4nt5IVcSUaha7lK7Bx8f3PagaNfgP6QRyEYF3ZOMksA
-void store_to_geo(geocode *store, char* apikey, char *lat, char *lng) {
+void store_to_geo(location *store, char* apikey, char *lat, char *lng) {
     char url[200] = "https://browse.search.hereapi.com/v1/browse?";
     add_if_api(url, apikey);
     add_strings(url, 6, "at=", lat, ",", lng, "&categories=600-6300-0066&name=", store->place_name);
@@ -102,11 +102,11 @@ void store_to_geo(geocode *store, char* apikey, char *lat, char *lng) {
         if (find_payment != NULL) break;
     }
     if (find_payment == NULL) printf("ERROR Store is not a store");
-    fill_geocode(store, str, i);
+    fill_location(store, str, i);
     free(str);
 }
 
-int *route_time(geocode *places, char *transportation, char *apikey, size_t places_len) {
+int *route_time(location *places, char *transportation, char *apikey, size_t places_len) {
     char url[1000] = "https://router.hereapi.com/v8/routes?";
     add_if_api(url, apikey);
     for (int i = 0; i < places_len; ++i) {
@@ -170,7 +170,7 @@ return travel_time;
 
 }
 
-void initialize_geocode(geocode *place) {
+void initialize_location(location *place) {
     strcpy(place->postalCode, "");
     strcpy(place->city,       "");
     strcpy(place->houseNumber,"");
@@ -186,7 +186,7 @@ void clrscr() {
     system("@cls||clear");
 }
 
-char *get_address(geocode *place, AddressComponent i) {
+char *get_address(location *place, AddressComponent i) {
     switch(i) {
         case STREET:        return place->street;
         case HOUSE_NUMBER:  return place->houseNumber;
@@ -200,7 +200,7 @@ char *get_address(geocode *place, AddressComponent i) {
     }
 }
 
-void set_address(geocode *place, AddressComponent i, char *str){
+void set_address(location *place, AddressComponent i, char *str){
     switch (i) {
         case STREET:
             strcpy(place->street, str);
