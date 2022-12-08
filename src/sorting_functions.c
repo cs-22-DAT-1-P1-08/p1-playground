@@ -29,11 +29,12 @@ item_t *find_cheapest_match(store_t *store, char *search_term) {
     return results;
 }
 
-item_t *compare_item(store_t stores[], char *search_term, size_t length_of_store)
+item_t *compare_item(store_t *store, char *search_term, size_t length_of_store)
 {
-    item_t *cheapest_item = find_cheapest_match(&stores[0], search_term);
+    item_t *cheapest_item = find_cheapest_match(&store[0], search_term);
+
     for (int i = 1; i < length_of_store; ++i) {
-            item_t *temp_match = find_cheapest_match(&stores[i], search_term);
+            item_t *temp_match = find_cheapest_match(&store[i], search_term);
             if (cmp_item_price(cheapest_item, temp_match)) {
                 *cheapest_item = *temp_match;
             }
@@ -41,10 +42,10 @@ item_t *compare_item(store_t stores[], char *search_term, size_t length_of_store
     return cheapest_item;
 }
 
-/*void print_items(store_t stores[], char *search_term)
+void print_items(store_t *store, char *search_term)
 {
-    for (int i = 0; i < stores; ++i) {
-        printf("%s: %lf", find_cheapest_match(&stores[i], search_term) );
-    }
-    printf("%s: %lf", compare_stores(stores, search_term).item, compare_stores(stores).price);
-}*/
+
+    printf("%s: %lf\n", find_cheapest_match(store, search_term)->name,
+                        find_cheapest_match(store, search_term)->price);
+    //printf("%s: %lf", compare_stores(stores, search_term).item, compare_stores(stores).price);
+}

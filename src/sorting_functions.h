@@ -10,8 +10,9 @@ int cmp_item_price(item_t *a, item_t *b);
 
 item_t *find_cheapest_match(store_t *store, char *search_term);
 
-item_t *compare_item(store_t stores[], char *search_term, size_t length_of_store);
+item_t *compare_item(store_t *store, char *search_term, size_t length_of_store);
 
+void print_items(store_t *stores, char *search_term);
 
 #ifndef P1_PLAYGROUND_SORTING_FUNCTIONS_H
 #define P1_PLAYGROUND_SORTING_FUNCTIONS_H
