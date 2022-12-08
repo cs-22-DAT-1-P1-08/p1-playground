@@ -31,18 +31,13 @@ item_t *find_cheapest_match(store_t *store, char *search_term) {
 
 item_t *compare_item(store_t stores[], char *search_term, size_t length_of_store)
 {
-    item_t *cheapest_item;
-    for (int i = 0; i < length_of_store; ++i) {
-        dlist_node_t *item_node = stores[i].items->head;
-        item_t *item = item_node->data;
-        if (item != NULL && strstr(item->name, search_term) != NULL) {
+    item_t *cheapest_item = find_cheapest_match(&stores[0], search_term);
+    for (int i = 1; i < length_of_store; ++i) {
             item_t *temp_match = find_cheapest_match(&stores[i], search_term);
             if (cmp_item_price(cheapest_item, temp_match)) {
                 *cheapest_item = *temp_match;
             }
-        }
     }
-
     return cheapest_item;
 }
 

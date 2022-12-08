@@ -12,8 +12,10 @@ int main() {
     // Grænseflade implementation
     char *search_term = "AGURK";
 
-    item_t *cheapest_store_item  = find_cheapest_match(stores, search_term);
-    printf("%s: %lf\n", cheapest_store_item->name, cheapest_store_item->price);
+
+    //item_t *cheapest_store_item  = find_cheapest_match(stores, search_term);
+    //printf("%s: %lf\n", cheapest_store_item->name, cheapest_store_item->price);
+
 
     item_t *cheapest_overall_item = compare_item(stores, search_term, 2);
     printf("%s: %lf", cheapest_overall_item->name, cheapest_overall_item->price);
