@@ -192,7 +192,8 @@ void recursive_find_offers_in_views(json_object *j_view, catalog_offers_t *catal
 
         /* Collect data from views with role "offer" */
         json_object *j_child_role = json_object_object_get(j_child_view, "role");
-        if (json_object_get_type(j_child_role) != json_type_string || strcmp(json_object_get_string(j_child_role), "offer") != 0)
+        if (json_object_get_type(j_child_role) != json_type_string ||
+            strcmp(json_object_get_string(j_child_role), "offer") != 0)
             continue;
 
         json_object *j_offer = json_object_object_get(
@@ -243,7 +244,8 @@ void recursive_find_offers_in_views(json_object *j_view, catalog_offers_t *catal
 
             // Could not find offer group
             if (offer->group == NULL) {
-                debug_print("Could not find matching offer group, freeing offer: %s %s %s\n", offer->ean, offer->title, group_id);
+                debug_print("Could not find matching offer group, freeing offer: %s %s %s\n",
+                            offer->ean, offer->title, group_id);
                 free(offer);
                 continue;
             }
