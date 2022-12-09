@@ -1,13 +1,31 @@
-#include "api/location_api.h"
-#include <stdlib.h>
 #include <stdio.h>
-#include "store.h"
+#include "api/coop_api.h"
 #include "api/tjek_api.h"
+#include "api/location_api.h
+#include "ui/main_view.h"
 #include "sorting_functions.h"
+#include "store.h"
+#include <stdlib.h>
 #include <curl/curl.h>
 #include <json-c/json.h>
+#include <locale.h>
+#include <wchar.h>
+#include <curses.h>
 
 int main() {
+    initscr();
+    noecho();
+
+    WINDOW *main_view = create_main_view(stdscr);
+    render_main_view(main_view);
+    destroy_main_view(main_view);
+
+
+
+    getch();
+    endwin();
+    return 0;
+    
     printf("Started program...\n");
 
     // Retrieve HERE API key
