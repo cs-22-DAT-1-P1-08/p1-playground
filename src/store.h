@@ -10,7 +10,7 @@ enum StoreType {
     SALLING
 };
 
-typedef struct store_t {
+typedef struct {
     char* name;
     geocode* location;
     catalog_offers_t* offers;

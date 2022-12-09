@@ -13,7 +13,7 @@ enum AmountUnit {
     PIECES
 };
 
-typedef struct amount_t {
+typedef struct {
     enum AmountUnit unit_type;
     double amount;
 } amount_t;
@@ -31,7 +31,7 @@ dlist_t* coop_get_items(char* store_id);
 /**
  * Struct for items
  */
-typedef struct item_t{
+typedef struct {
     char* ean;
     double price;
     char* name;
