@@ -3,6 +3,7 @@
 #include "api/tjek_api.h"
 #include "api/location_api.h"
 #include "ui/main_view.h"
+#include "ui/shopping_list_view.h"
 #include "sorting_functions.h"
 #include "store.h"
 #include <stdlib.h>
@@ -16,9 +17,30 @@ int main() {
     initscr();
     noecho();
 
+    start_color();			/* Start color 			*/
+    // 77, 128, 247
+    init_color(1, (short)(77.0/255.0*1000), (short)(128.0/255.0*1000), (short)(247.0/255.0*1000));
+    init_pair(1, 1, COLOR_BLACK);
+
+    enum MainViewMenuOptions selected;
+
     WINDOW *main_view = create_main_view(stdscr);
-    render_main_view(main_view);
+    render_main_view(main_view, &selected);
     destroy_main_view(main_view);
+
+
+    if (selected == QUIT) {
+        return 0;
+    }
+
+    // Assume shopping list for now
+    dlist_t *shopping_list = calloc(1, sizeof(dlist_t));
+    render_shopping_list(stdscr, shopping_list);
+    printw("Shopping list length: %d\n", shopping_list->count);
+    for (int i = 0; i < shopping_list->count; i++) {
+        printw(" - %s\n", dlist_get_at(shopping_list, i)->data);
+    }
+
 
 
 

@@ -113,9 +113,9 @@ int ui()
     demo_products products1[40];
 
     //Filling the struct with demo/fake data
-    char* demo_store[] = {"Netto", "Fakta", "Aldi", "Lidl", "Rema 1000", "Foetex", "Irma", "SuperBrugsen", "Kvickly", "Spar"};
+    char* demo_store[] = {"SuperBrugsen", "Fakta", "Aldi", "Lidl", "Rema 1000", "Foetex", "Irma", "SuperBrugsen", "Kvickly", "Spar"};
     char* demo_weight[] = {"999g","1L", "250g", "500g", "1kg", "5dl", "2kg", "2L", "7dl", "25g"};
-    double demo_price[] = {9999.50,9998.95, 40.00, 12.99, 19.00, 22.50, 49.50, 120.00, 10.00, 7.49};
+    double demo_price[] = {40.00, 12.99, 19.00, 22.50, 49.50, 120.00, 10.00, 7.49};
     int demo_distance[] = {551, 181, 2224, 752, 42, 576, 1296, 392, 226, 127};
 
     initscr(); // Start curses mode
