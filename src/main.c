@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include "api/coop_api.h"
 #include "api/tjek_api.h"
-#include "api/location_api.h
+#include "api/location_api.h"
 #include "ui/main_view.h"
 #include "sorting_functions.h"
 #include "store.h"
