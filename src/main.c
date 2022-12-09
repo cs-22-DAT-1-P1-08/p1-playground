@@ -1,17 +1,29 @@
 #include <stdio.h>
 #include "api/coop_api.h"
-#include <stdlib.h>
 #include "api/tjek_api.h"
+#include "ui/main_view.h"
+#include <stdlib.h>
 #include <curl/curl.h>
 #include <locale.h>
 #include <wchar.h>
+#include <curses.h>
 
 void coop_api_temp(void);
 void tjek_api_temp();
 
 
 int main() {
-    coop_api_temp();
+    initscr();
+    noecho();
+
+    WINDOW *main_view = create_main_view(stdscr);
+    render_main_view(main_view);
+    destroy_main_view(main_view);
+
+
+
+    getch();
+    endwin();
     return 0;
 }
 
