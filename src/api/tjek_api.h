@@ -10,7 +10,7 @@
 /**
  * Stores information from Tjek API about grocery catalog (sales paper)
  */
-typedef struct catalog_info_t {
+typedef struct {
     char *id;
     char *dealer_id;
     int offer_count;
@@ -22,7 +22,7 @@ typedef struct catalog_info_t {
 /**
  * Collection of products with common campaign/offer
  */
-typedef struct offer_group_t {
+typedef struct {
     char *id;
     char *heading;
     double price;
@@ -32,7 +32,7 @@ typedef struct offer_group_t {
 /**
  * Specific product offer within a campaign/offer
  */
-typedef struct offer_t {
+typedef struct {
     offer_group_t *group;
     char *ean;
     char *title;
@@ -41,7 +41,7 @@ typedef struct offer_t {
 /**
  * All offers in a catalog (sales paper)
  */
-typedef struct catalog_offers_t {
+typedef struct {
     dlist_t *offer_groups;
     dlist_t *products;
 } catalog_offers_t;
