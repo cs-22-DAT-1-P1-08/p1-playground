@@ -42,5 +42,6 @@ typedef struct item_t{
 
 
 void free_item(item_t* item);
+double get_item_price(item_t* item);
 
 #endif //P1_PLAYGROUND_COOP_API_H
