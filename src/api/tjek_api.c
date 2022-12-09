@@ -82,7 +82,7 @@ catalog_info_t* get_catalog_info(char *dealer_id) {
 catalog_offers_t* get_catalog_offers(catalog_info_t *catalog_info) {
     catalog_offers_t *result = calloc(1, sizeof(catalog_offers_t));
     result->offer_groups = calloc(1, sizeof(dlist_t));
-    result->offers = calloc(1, sizeof(dlist_t));
+    result->products = calloc(1, sizeof(dlist_t));
 
     for (int i = 0; i < catalog_info->offer_count / 24 + 1; i++) {
         int offset = i * 24;
@@ -192,7 +192,8 @@ void recursive_find_offers_in_views(json_object *j_view, catalog_offers_t *catal
 
         /* Collect data from views with role "offer" */
         json_object *j_child_role = json_object_object_get(j_child_view, "role");
-        if (json_object_get_type(j_child_role) != json_type_string || strcmp(json_object_get_string(j_child_role), "offer") != 0)
+        if (json_object_get_type(j_child_role) != json_type_string ||
+            strcmp(json_object_get_string(j_child_role), "offer") != 0)
             continue;
 
         json_object *j_offer = json_object_object_get(
@@ -243,12 +244,13 @@ void recursive_find_offers_in_views(json_object *j_view, catalog_offers_t *catal
 
             // Could not find offer group
             if (offer->group == NULL) {
-                debug_print("Could not find matching offer group, freeing offer: %s %s %s\n", offer->ean, offer->title, group_id);
+                debug_print("Could not find matching offer group, freeing offer: %s %s %s\n",
+                            offer->ean, offer->title, group_id);
                 free(offer);
                 continue;
             }
 
-            dlist_add(catalog_offers->offers, offer);
+            dlist_add(catalog_offers->products, offer);
         }
     }
 }
@@ -297,7 +299,7 @@ void free_catalog_offers(catalog_offers_t *catalog_offers) {
         return;
 
     dlist_free_all(catalog_offers->offer_groups, (void (*)(void *)) free_offer_group);
-    dlist_free_all(catalog_offers->offers, (void (*)(void *)) free_offer);
+    dlist_free_all(catalog_offers->products, (void (*)(void *)) free_offer);
     free(catalog_offers);
 }
 

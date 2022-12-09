@@ -84,3 +84,12 @@ void dlist_free_all(dlist_t *dlist, void free_node_data(void* node_data)) {
 
     free(dlist);
 }
+
+void dlist_fill_array(dlist_t *dlist, void *out_array[]) {
+    int i = 0;
+    dlist_node_t *node = dlist->head;
+    for (int i = 0; i < dlist->count; i++) {
+        out_array[i] = node->data;
+        node = node->next;
+    }
+}

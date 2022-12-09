@@ -40,20 +40,26 @@ dlist_t* coop_get_items(char* store_id){
         json_object* j_price = json_object_object_get(j_item, "Pris");
         json_object* j_amount = json_object_object_get(j_item, "Navn2");
 
-        item->name = calloc(strlen(json_object_get_string(j_name)) + 1, sizeof(char));
+        item->name =
+                calloc(strlen(json_object_get_string(j_name)) + 1, sizeof(char));
         strcpy(item->name, json_object_get_string(j_name));
 
-        item->ean = calloc(strlen(json_object_get_string(j_ean)) + 1, sizeof(char));
+        item->ean =
+                calloc(strlen(json_object_get_string(j_ean)) + 1, sizeof(char));
         strcpy(item->ean, json_object_get_string(j_ean));
 
-        item->details = calloc(strlen(json_object_get_string(j_amount)) + 1, sizeof(char));
+        item->details =
+                calloc(strlen(json_object_get_string(j_amount)) + 1, sizeof(char));
         strcpy(item->details, json_object_get_string(j_amount));
 
-        item->amount = find_amount_from_string(item->details);
+        item->amount =
+                find_amount_from_string(item->details);
         if (item->amount == NULL)
-            item->amount = find_amount_from_string(item->name);
+            item->amount =
+                    find_amount_from_string(item->name);
 
-        item->price = json_object_get_double(j_price);
+        item->price =
+                json_object_get_double(j_price);
 
         dlist_add(item_list, item);
     }
@@ -92,6 +98,8 @@ amount_t* find_amount_from_string(char* input_str){
     char number_buffer[NUMBER_BUFFER_SIZE];
     int number_len = 0;
 
+    double temp_number = 0;
+
     for (int i = 0; i < input_len; i++) {
         // Ignore whitespace
         if (input_str[i] == ' ') continue;
@@ -102,11 +110,16 @@ amount_t* find_amount_from_string(char* input_str){
             number_len = 0;
             memset(number_buffer, 0, sizeof(number_buffer));
 
-            while (i < input_len && strchr("0123456789", input_str[i])) {
-                number_buffer[number_len++] = input_str[i];
+            while (i < input_len && strchr("0123456789,", input_str[i])) {
+                number_buffer[number_len++] = (input_str[i] == ',') ? '.' : input_str[i];
                 i++;
             }
 
+            char* endptr;
+            temp_number = strtod(number_buffer, &endptr);
+
+            // we are going to increment too much when continuing in loop - decrement here to compensate
+            i--;
             continue;
         }
 
@@ -128,34 +141,35 @@ amount_t* find_amount_from_string(char* input_str){
         /* Handle unit or multiplier keywords */
         if (strcmp(word, "G") == 0 || strcmp(word, "GRAM") == 0) {
             result->unit_type = GRAMS;
-            result->amount = multiplier * atoi(number_buffer);
+            result->amount = multiplier * temp_number;
         }
         else if (strcmp(word, "KG") == 0) {
             result->unit_type = GRAMS;
-            result->amount = multiplier * atoi(number_buffer) * 1000;
+            result->amount = multiplier * temp_number * 1000;
         }
         else if (strcmp(word, "L") == 0 || strcmp(word, "LITER") == 0){
             result->unit_type = LITERS;
-            result->amount = multiplier * atoi(number_buffer);
+            result->amount = multiplier * temp_number;
         }
         else if (strcmp(word, "CL") == 0 || strcmp(word, "CENTILITER") == 0){
             result->unit_type = LITERS;
-            result->amount = multiplier * atoi(number_buffer)/10;
+            result->amount = multiplier * temp_number/100;
+
         }
         else if (strcmp(word, "DL") == 0 || strcmp(word, "DECILITER") == 0){
             result->unit_type = LITERS;
-            result->amount = multiplier * atoi(number_buffer)/100;
+            result->amount = multiplier * temp_number/10;
         }
         else if (strcmp(word, "ML") == 0 || strcmp(word, "MILLILITER") == 0){
             result->unit_type = LITERS;
-            result->amount = multiplier * atoi(number_buffer)/1000;
+            result->amount = multiplier * temp_number/1000;
         }
         else if (strcmp(word, "STK") == 0){
             result->unit_type = PIECES;
-            result->amount = multiplier * atoi(number_buffer);
+            result->amount = multiplier * temp_number;
         }
         else if (strcmp(word, "X") == 0) {
-            multiplier = (double)atoi(number_buffer);
+            multiplier = (double)temp_number;
         }
     }
 

@@ -1,16 +1,16 @@
 #include <stdio.h>
 #include "api/coop_api.h"
 #include "api/tjek_api.h"
+#include "api/location_api.h
 #include "ui/main_view.h"
+#include "sorting_functions.h"
+#include "store.h"
 #include <stdlib.h>
 #include <curl/curl.h>
+#include <json-c/json.h>
 #include <locale.h>
 #include <wchar.h>
 #include <curses.h>
-
-void coop_api_temp(void);
-void tjek_api_temp();
-
 
 int main() {
     initscr();
@@ -25,48 +25,47 @@ int main() {
     getch();
     endwin();
     return 0;
-}
+    
+    printf("Started program...\n");
 
-void coop_api_temp(void){
-    /* Daglibrugsen */
-    dlist_t* list_dagligbrugsen = coop_get_items("1290");
-
-    /* coop 365 */
-    dlist_t* list_coop365 = coop_get_items("24165");
-
-    dlist_node_t *item_node = list_dagligbrugsen->head;
-    while (item_node != NULL) {
-        item_t *item = item_node->data;
-        if (item->amount != NULL) {
-            printf("%s: %.2lf %s\n", item->name, item->amount->amount, get_unit_name(item->amount->unit_type));
-        }
-
-        item_node = item_node->next;
+    // Retrieve HERE API key
+    char* here_api_key = getenv("HERE_API_KEY");
+    if (here_api_key == NULL) {
+        fprintf(stderr, "Failed to retrieve HERE_API_KEY from environment variables.");
+        exit(EXIT_FAILURE);
     }
 
+    // Fill home location
+    geocode home;
 
-    dlist_free_all(list_dagligbrugsen, (void (*)(void *)) free_item);
-    dlist_free_all(list_coop365, (void (*)(void *)) free_item);
-}
+    initialize_geocode(&home);
+    strcpy(home.street, "Hadsundvej");
+    strcpy(home.houseNumber, "44");
+    strcpy(home.postalCode, "9000");
+    strcpy(home.place_name, "home");
+    addr_to_geo(&home, here_api_key);
 
-void tjek_api_temp() {
-    catalog_info_t *db_catalog_info = get_catalog_info(COOP365_DEALER_ID);
-    printf("%s: %d\n", db_catalog_info->id, db_catalog_info->offer_count);
+    // Prepare stores
+    store_t *daglibrugsen = get_coop_store("Dagli'Brugsen", "1290", DB_DEALER_ID);
+    store_t *coop365 = get_coop_store("Coop 365", "24165", COOP365_DEALER_ID);
 
-    catalog_offers_t *catalog_offers = get_catalog_offers(db_catalog_info);
+    // Fill store locations
+    fill_nearest_store(daglibrugsen, &home);
+    fill_nearest_store(coop365, &home);
 
-    dlist_node_t *offer_node = catalog_offers->offers->head;
-    while (offer_node != NULL) {
-        offer_t *offer = (offer_t*)offer_node->data;
-        if (offer->group == NULL) {
-            printf("Something is rotten in the state of Denmark...\n");
-            offer_node = offer_node->next;
-            continue;
-        }
-        printf("%.2lf kr, %s [%s]\n", offer->group->price, offer->title, offer->ean);
-        offer_node = offer_node->next;
-    }
+    // Get the route time
+    /*geocode places[] = {home, *coop365->location, *daglibrugsen->location};
+    int *arr = route_time(places, "car", here_api_key, 3);
 
-    free_catalog_offers(catalog_offers);
-    free_catalog_info(db_catalog_info);
+    for (int i = 0; i < 3; i++) {
+        printf("\n\n%d", arr[i]);
+    }*/
+
+    // Grænseflade implementation
+    printf("%s: %lf", find_cheapest_match(daglibrugsen, "TUBORG").name,
+           find_cheapest_match(daglibrugsen, "TUBORG").price);
+
+    free_store(daglibrugsen);
+    free_store(coop365);
+    return 0;
 }

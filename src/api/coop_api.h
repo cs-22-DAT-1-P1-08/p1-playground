@@ -5,7 +5,7 @@
 #ifndef P1_PLAYGROUND_COOP_API_H
 #define P1_PLAYGROUND_COOP_API_H
 #include "../util/dlist.h"
-
+#include "tjek_api.h"
 
 enum AmountUnit {
     GRAMS,
@@ -37,6 +37,7 @@ typedef struct item_t{
     char* name;
     char* details;
     amount_t* amount;
+    offer_t* offer;
 } item_t;
 
 
