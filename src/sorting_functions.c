@@ -4,7 +4,6 @@
 #include "store.h"
 #include <string.h>
 #include "sorting_functions.h"
-#include <curl/curl.h>
 #include <stdlib.h>
 #include <math.h>
 
@@ -14,7 +13,7 @@ int cmp_item_price(item_t *a, item_t *b) {
 }
 
 item_t *find_cheapest_match(store_t *store, char *search_term) {
-    dlist_node_t *item_node = store->items->head;
+    dlist_node_t *item_node = store->products->head;
     item_t *results = NULL;
     while (item_node != NULL) {
         item_t *item = item_node->data;
@@ -53,17 +52,14 @@ item_t *different_items(store_t *store[], char *search_term[], size_t length_of_
 }
 
 int cmp_amount(item_t item, amount_t UI){
-    if (item.amount == NULL) {
-        return UI.amount;
-    }
     int n = ceil(UI.amount / item.amount->amount);
     if(n < 1){
         return 1;
-    } else if(n > 1){
+    } else if(n > 1) {
         return n;
+    } else if (item.amount == NULL) {
+        return UI.amount;
     }
-
-
 }
 
 void print_item(store_t *store[], char *search_term[], char *amounts[], size_t length_of_store, size_t input_of_product) {
