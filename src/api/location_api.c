@@ -5,7 +5,7 @@
 #include <string.h>
 #include <stdarg.h>
 #include <json-c/json.h>
-#include "util/curlext.h"
+#include "../util/curlext.h"
 
 void add_strings(char *str_dest, int args,...) {
     va_list valist;

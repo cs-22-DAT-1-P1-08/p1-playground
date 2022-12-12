@@ -12,7 +12,7 @@ enum StoreType {
 
 typedef struct {
     char* name;
-    geocode* location;
+    location_t* location;
     catalog_offers_t* offers;
     dlist_t* products;
     catalog_info_t* catalog_info;
@@ -24,7 +24,7 @@ store_t* get_coop_store(char* store_name, char* store_id, char* dealer_id);
  * Fills store location information based on a home location.
  * @param home target location, find store close to this location.
  */
-void fill_nearest_store(store_t *store, geocode *home);
+void fill_nearest_store(store_t *store, location_t *home);
 
 void free_store(store_t *store);
 

@@ -47,12 +47,12 @@ store_t* get_coop_store(char* store_name, char* store_id, char* dealer_id) {
     return store;
 }
 
-void fill_nearest_store(store_t *store, geocode *home) {
+void fill_nearest_store(store_t *store, location_t *home) {
     if (store->location == NULL) {
-        store->location = malloc(sizeof(geocode));
+        store->location = malloc(sizeof(location_t));
     }
 
-    initialize_geocode(store->location);
+    initialize_location(store->location);
 
     char* escaped_name = curl_escape(store->name, strlen(store->name));
     strcpy(store->location->place_name, escaped_name);
