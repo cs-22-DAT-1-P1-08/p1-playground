@@ -17,8 +17,7 @@ int main() {
     initscr();
     noecho();
 
-    start_color();			/* Start color 			*/
-    // 77, 128, 247
+    start_color();			/* Start color */
     init_color(1, (short)(77.0/255.0*1000), (short)(128.0/255.0*1000), (short)(247.0/255.0*1000));
     init_pair(1, 1, COLOR_BLACK);
 
@@ -40,9 +39,6 @@ int main() {
     for (int i = 0; i < shopping_list->count; i++) {
         printw(" - %s\n", dlist_get_at(shopping_list, i)->data);
     }
-
-
-
 
     getch();
     endwin();
