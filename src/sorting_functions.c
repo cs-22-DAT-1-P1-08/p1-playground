@@ -58,7 +58,7 @@ int cmp_amount(item_t item, amount_t UI){
     } else if(n > 1) {
         return n;
     } else if (item.amount == NULL) {
-        return UI.amount;
+        return (int) UI.amount;
     }
 }
 
