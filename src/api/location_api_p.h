@@ -1,7 +1,7 @@
-#ifndef P1_PLAYGROUND_API_P_H
-#define P1_PLAYGROUND_API_P_H
+#ifndef P1_PLAYGROUND_LOCATION_API_P_H
+#define P1_PLAYGROUND_LOCATION_API_P_H
 
-#include "api.h"
+#include "location_api.h"
 
 /**
  * Uses strarg library to add unlimited arguments to str_dest
@@ -61,4 +61,4 @@ void set_address (location_t *place, AddressComponent i, char *str);
  */
 int *json_to_traveltime(json_object *jobj, location_t* places, size_t places_len);
 
-#endif //P1_PLAYGROUND_API_P_H
+#endif //P1_PLAYGROUND_LOCATION_API_P_H

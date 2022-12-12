@@ -1,5 +1,5 @@
-#include "api.h"
-#include "api_p.h"
+#include "location_api.h"
+#include "location_api_p.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -87,7 +87,7 @@ void fill_location(location_t *place, char *str, int item_num){
 
 //https://browse.search.hereapi.com/v1/browse?at=57.04074,9.95146&categories=600-6300-0066,800-8500-0178&name=rema 1000&apiKey=4nt5IVcSUaha7lK7Bx8f3PagaNfgP6QRyEYF3ZOMksA
 void store_to_geo(location_t *store, char* apikey, char *lat, char *lng) {
-    char url[200] = "https://browse.search.hereapi.com/v1/browse?";
+    char url[1000] = "https://browse.search.hereapi.com/v1/browse?";
     add_if_api(url, apikey);
     add_strings(url, 6, "at=", lat, ",", lng, "&categories=600-6300-0066&name=", store->place_name);
     char *str = curlext_easy_fetch(url, "https");
@@ -168,6 +168,7 @@ int *route_time(location_t *places, char *transportation, char *apikey, size_t p
         }
         add_strings(url, 4, places[i].lat, ",", places[i].lng, "&");
     }
+
     add_strings(url, 2,"return=travelSummary&transportMode=", transportation);
 
     char *str = curlext_easy_fetch(url, "https");

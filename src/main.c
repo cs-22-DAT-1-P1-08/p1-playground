@@ -1,67 +1,98 @@
-#include "api.h"
-#include <stdlib.h>
 #include <stdio.h>
-#include <curl/curl.h>
-#include <json-c/json.h>
+#include "api/coop_api.h"
+#include "api/tjek_api.h"
+#include "api/location_api.h"
+#include "ui/main_view.h"
+#include "ui/shopping_list_view.h"
+#include "sorting_functions.h"
+#include "store.h"
+#include <stdlib.h>
 
 int main() {
-    char apikey[100];
-    scanf("%s", apikey);
-    location_t hjem;
-    initialize_location(&hjem);
-    strcpy(hjem.street, "Hadsundvej");
-    strcpy(hjem.houseNumber, "44");
-    strcpy(hjem.postalCode, "9000");
-    strcpy(hjem.place_name, "home");
-    addr_to_geo(&hjem, apikey);
+    initscr();
+    noecho();
 
-    location_t spar;
-    initialize_location(&spar);
-    strcpy(spar.place_name, "rema");
-    strcpy(spar.city, hjem.city);
+    start_color();			/* Start color */
+    init_color(1, (short)(77.0/255.0*1000), (short)(128.0/255.0*1000), (short)(247.0/255.0*1000));
+    init_pair(1, 1, COLOR_BLACK);
 
-    //store_to_geo(&spar, apikey, hjem.lat, hjem.lng);
-    //for (int i = 0; i < 6; ++i) {
-    //    printf("\n%s", get_address(&spar, i));
-    //}
-    location_t places[] = {hjem, spar, hjem};
-    int *arr = route_time(places, "bicycle", apikey, 3);
+    enum MainViewMenuOptions selected;
 
-    printf("entire route duration: %d", arr[0]);
-    for (int i = 1; i < 3; ++i) {
-        char temp_dest_name[40];
-        for (int j = 0; j < 3; ++j) {
-            if (places[j].dest_on_route == i) {
-                strcpy(temp_dest_name, places[j].place_name);
-                break;
-            }
-        }
-        printf("\n\n%s %d",temp_dest_name, arr[i]);
+    WINDOW *main_view = create_main_view(stdscr);
+    render_main_view(main_view, &selected);
+    destroy_main_view(main_view);
+
+
+    if (selected == QUIT) {
+        return 0;
     }
-    /*
-    location_t hulla;
-    initialize_location(&hulla);
-    strcpy(hulla.street, "Hadsundvej");
-    strcpy(hulla.houseNumber, "44");
-    char apikey[100];
-    scanf("%s", apikey);
-    addr_to_geo(&hulla,apikey);
-    printf("street:%s county:%s houseNumber: %s postalCode: %s state: %s city: %s lat: %s lng: %s",hulla.street, hulla.county, hulla.houseNumber, hulla.postalCode, hulla.state, hulla.city, hulla.lat, hulla.lng);
-    */
 
-
-    /*char url[200] = "https://discover.search.hereapi.com/v1/discover?at=57.04074,9.95146&limit=1&q=fakta&apiKey=";
-    char apikey[100];
-    scanf("%s", apikey);
-    add_strings(url, 1, apikey);
-    char *str = malloc(sizeof(char) * 100000);
-    if (str == NULL) {
-        perror("could not create big string");
-        exit(1);
+    // Assume shopping list for now
+    dlist_t *shopping_list = calloc(1, sizeof(dlist_t));
+    render_shopping_list(stdscr, shopping_list);
+    printw("Shopping list length: %d\n", shopping_list->count);
+    for (int i = 0; i < shopping_list->count; i++) {
+        printw(" - %s\n", dlist_get_at(shopping_list, i)->data);
     }
-    api_to_str(url, "https", str);
 
-    printf("%s\n\n", str);
-    free(str);*/
+    getch();
+    endwin();
+    return 0;
+    
+    printf("Started program...\n");
+    
+    // Lucas
+    /*store_t *daglibrugsen = get_coop_store("1290", DB_DEALER_ID);
+    store_t *coop365 = get_coop_store("24165", COOP365_DEALER_ID);
+    store_t *stores[] = {daglibrugsen,
+                         coop365};
+    // Grænseflade implementation
+    char *search_term[] = {"SMOERBAR", "SALT", "AGURK"};
+    char *amount[] = {"700 GRAM", "600 GRAM", "2 STK"};
+
+
+    //Output
+    print_item(stores, search_term, amount, 2, 3);*/
+    
+
+    // Retrieve HERE API key
+    char* here_api_key = getenv("HERE_API_KEY");
+    if (here_api_key == NULL) {
+        fprintf(stderr, "Failed to retrieve HERE_API_KEY from environment variables.");
+        exit(EXIT_FAILURE);
+    }
+
+    // Fill home location
+    location_t home;
+
+    initialize_location(&home);
+    strcpy(home.street, "Hadsundvej");
+    strcpy(home.houseNumber, "44");
+    strcpy(home.postalCode, "9000");
+    strcpy(home.place_name, "home");
+    addr_to_geo(&home, here_api_key);
+
+    // Prepare stores
+    store_t *daglibrugsen = get_coop_store("Dagli'Brugsen", "1290", DB_DEALER_ID);
+    store_t *coop365 = get_coop_store("Coop 365", "24165", COOP365_DEALER_ID);
+
+    // Fill store locations
+    fill_nearest_store(daglibrugsen, &home);
+    fill_nearest_store(coop365, &home);
+
+    // Get the route time
+    /*geocode places[] = {home, *coop365->location, *daglibrugsen->location};
+    int *arr = route_time(places, "car", here_api_key, 3);
+
+    for (int i = 0; i < 3; i++) {
+        printf("\n\n%d", arr[i]);
+    }*/
+
+    // Grænseflade implementation
+    printf("%s: %lf", find_cheapest_match(daglibrugsen, "TUBORG")->name,
+           find_cheapest_match(daglibrugsen, "TUBORG")->price);
+
+    free_store(daglibrugsen);
+    free_store(coop365);
     return 0;
 }

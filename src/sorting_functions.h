@@ -8,7 +8,15 @@
 
 int cmp_item_price(item_t *a, item_t *b);
 
-item_t find_cheapest_match(store_t *store, char* search_term);
+item_t *find_cheapest_match(store_t *store, char *search_term);
+
+item_t *compare_item(store_t *store[], char *search_term, size_t length_of_store);
+
+item_t *different_items(store_t *store[], char *search_term[], size_t length_of_store, size_t length_of_input);
+
+int cmp_amount(item_t item, amount_t UI);
+
+void print_item(store_t *store[], char *search_term[], char *amounts[], size_t length_of_store, size_t input_of_product);
 
 
 #ifndef P1_PLAYGROUND_SORTING_FUNCTIONS_H

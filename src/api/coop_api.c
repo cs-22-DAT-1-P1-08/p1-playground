@@ -40,20 +40,26 @@ dlist_t* coop_get_items(char* store_id){
         json_object* j_price = json_object_object_get(j_item, "Pris");
         json_object* j_amount = json_object_object_get(j_item, "Navn2");
 
-        item->name = calloc(strlen(json_object_get_string(j_name)) + 1, sizeof(char));
+        item->name =
+                calloc(strlen(json_object_get_string(j_name)) + 1, sizeof(char));
         strcpy(item->name, json_object_get_string(j_name));
 
-        item->ean = calloc(strlen(json_object_get_string(j_ean)) + 1, sizeof(char));
+        item->ean =
+                calloc(strlen(json_object_get_string(j_ean)) + 1, sizeof(char));
         strcpy(item->ean, json_object_get_string(j_ean));
 
-        item->details = calloc(strlen(json_object_get_string(j_amount)) + 1, sizeof(char));
+        item->details =
+                calloc(strlen(json_object_get_string(j_amount)) + 1, sizeof(char));
         strcpy(item->details, json_object_get_string(j_amount));
 
-        item->amount = find_amount_from_string(item->details);
+        item->amount =
+                find_amount_from_string(item->details);
         if (item->amount == NULL)
-            item->amount = find_amount_from_string(item->name);
+            item->amount =
+                    find_amount_from_string(item->name);
 
-        item->price = json_object_get_double(j_price);
+        item->price =
+                json_object_get_double(j_price);
 
         dlist_add(item_list, item);
     }
@@ -179,4 +185,10 @@ amount_t* find_amount_from_string(char* input_str){
 const char* get_unit_name(enum AmountUnit unit) {
     static const char* names[] = { "grams", "liters", "pieces"};
     return names[unit];
+}
+
+double get_item_price(item_t* item) {
+    if (item->offer != NULL)
+        return item->offer->group->price;
+    return item->price;
 }

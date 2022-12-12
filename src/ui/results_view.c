@@ -1,8 +1,8 @@
+#include "results_view.h"
 #include <curses.h>
-#include <string.h>
-#include <time.h>
 #include <stdlib.h>
 
+/*
 //a struct for fake data
 typedef struct {
     char product_name[30];
@@ -40,9 +40,7 @@ void lines(demo_products products2[], int row, int size)
     }
 }
 
-//Prints the shopping list
-void print_shopping_list(char* test, demo_products products2[], int size)
-{
+int render_results_view(WINDOW window, results_view_data_t *data) {
     double total_price1;
     double total_price2;
     char* word1 = products2[rand() % size].store;
@@ -94,59 +92,4 @@ void print_shopping_list(char* test, demo_products products2[], int size)
 
     lines(products2,6+i,size);
     mvprintw(6+i, 12+check_longest_word(products2, size), "+--------------------+--------------------+\n\n");
-}
-
-int ui()
-{
-    //int size = sizeof(products1) / sizeof(products1[0]);
-
-    srand(time(NULL)); // This is just for testing and won't be in the final
-
-    char name_test1[20] = "Product 1";
-    char name_test2[20] = "Product 2";
-    char input[30];
-    int price_test1 = 30;
-    int price_test2 = 12;
-    int i = 0;
-    int size = 0;
-
-    demo_products products1[40];
-
-    //Filling the struct with demo/fake data
-    char* demo_store[] = {"SuperBrugsen", "Fakta", "Aldi", "Lidl", "Rema 1000", "Foetex", "Irma", "SuperBrugsen", "Kvickly", "Spar"};
-    char* demo_weight[] = {"999g","1L", "250g", "500g", "1kg", "5dl", "2kg", "2L", "7dl", "25g"};
-    double demo_price[] = {40.00, 12.99, 19.00, 22.50, 49.50, 120.00, 10.00, 7.49};
-    int demo_distance[] = {551, 181, 2224, 752, 42, 576, 1296, 392, 226, 127};
-
-    initscr(); // Start curses mode
-
-    mvprintw(1, 1, "Enter products name (type q to stop)\n");
-
-    while (strcmp(input, "q") != 0) //This is purely for testing data and won't be in the final version
-    {
-        getstr(input);
-        strcpy(products1[i].product_name,input);
-        strcpy(products1[i].store,demo_store[i]);
-        strcpy(products1[i].amount,demo_weight[i]);
-        products1[i].price = demo_price[i];
-        products1[i].distance = demo_distance[i];
-
-        i++;
-        size++;
-    }
-
-    clear(); //Clears the screen
-
-    print_shopping_list(name_test1, products1, size);
-
-    refresh(); // Update screen
-    getchar();
-    endwin(); // End curses mode
-    return 0;
-}
-
-int main()
-{
-    ui();
-    return 0;
-}
+}*/

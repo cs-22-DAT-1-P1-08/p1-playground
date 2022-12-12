@@ -27,6 +27,17 @@ dlist_t* dlist_insert(dlist_t *dlist, void *data, int at_tail) {
     return dlist;
 }
 
+dlist_node_t* dlist_get_at(dlist_t *dlist, int index) {
+    if (index >= dlist->count)
+        return NULL;
+
+    dlist_node_t *node = dlist->head;
+    for (int i = 0; i < index; i++)
+        node = node->next;
+
+    return node;
+}
+
 void* dlist_remove(dlist_t *dlist, dlist_node_t *node) {
     if (node->prev != NULL)
         node->prev->next = node->next;
@@ -42,6 +53,13 @@ void* dlist_remove(dlist_t *dlist, dlist_node_t *node) {
 
     dlist->count--;
     return node_data;
+}
+
+void* dlist_remove_at(dlist_t *dlist, int index) {
+    dlist_node_t *node = dlist_get_at(dlist, index);
+    if (node == NULL)
+        return NULL;
+    return dlist_remove(dlist, node);
 }
 
 void* dlist_remove_head(dlist_t *dlist) {
