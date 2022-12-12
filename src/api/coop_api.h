@@ -13,9 +13,9 @@ enum AmountUnit {
     PIECES
 };
 
-typedef struct {
-    enum AmountUnit unit_type;
+typedef struct{
     double amount;
+    enum AmountUnit unit_type;
 } amount_t;
 
 amount_t* find_amount_from_string(char* input_str);
@@ -31,6 +31,7 @@ dlist_t* coop_get_items(char* store_id);
 /**
  * Struct for items
  */
+
 typedef struct {
     char* ean;
     double price;
@@ -42,5 +43,6 @@ typedef struct {
 
 
 void free_item(item_t* item);
+double get_item_price(item_t* item);
 
 #endif //P1_PLAYGROUND_COOP_API_H

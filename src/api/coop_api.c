@@ -186,3 +186,9 @@ const char* get_unit_name(enum AmountUnit unit) {
     static const char* names[] = { "grams", "liters", "pieces"};
     return names[unit];
 }
+
+double get_item_price(item_t* item) {
+    if (item->offer != NULL)
+        return item->offer->group->price;
+    return item->price;
+}
