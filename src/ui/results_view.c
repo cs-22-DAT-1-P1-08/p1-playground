@@ -2,6 +2,7 @@
 #include <curses.h>
 #include <stdlib.h>
 
+/*
 //a struct for fake data
 typedef struct {
     char product_name[30];
@@ -91,4 +92,4 @@ int render_results_view(WINDOW window, results_view_data_t *data) {
 
     lines(products2,6+i,size);
     mvprintw(6+i, 12+check_longest_word(products2, size), "+--------------------+--------------------+\n\n");
-}
+}*/

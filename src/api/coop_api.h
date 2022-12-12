@@ -32,7 +32,7 @@ dlist_t* coop_get_items(char* store_id);
  * Struct for items
  */
 
-typedef struct {
+typedef struct item_t {
     char* ean;
     double price;
     char* name;

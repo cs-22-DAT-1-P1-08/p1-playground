@@ -14,7 +14,7 @@ int cmp_item_price(item_t *a, item_t *b) {
 }
 
 item_t *find_cheapest_match(store_t *store, char *search_term) {
-    dlist_node_t *item_node = store->items->head;
+    dlist_node_t *item_node = store->products->head;
     item_t *results = NULL;
     while (item_node != NULL) {
         item_t *item = item_node->data;

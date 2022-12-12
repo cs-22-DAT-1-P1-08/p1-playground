@@ -94,8 +94,8 @@ int main() {
     }*/
 
     // Grænseflade implementation
-    printf("%s: %lf", find_cheapest_match(daglibrugsen, "TUBORG").name,
-           find_cheapest_match(daglibrugsen, "TUBORG").price);
+    printf("%s: %lf", find_cheapest_match(daglibrugsen, "TUBORG")->name,
+           find_cheapest_match(daglibrugsen, "TUBORG")->price);
 
     free_store(daglibrugsen);
     free_store(coop365);
