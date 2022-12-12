@@ -5,6 +5,7 @@
 #include "sorting_functions.h"
 #include <curl/curl.h>
 #include <stdlib.h>
+#include <math.h>
 
 //compares results to the new item found in the list
 int cmp_item_price(item_t *a, item_t *b) {
@@ -26,7 +27,6 @@ item_t *find_cheapest_match(store_t *store, char *search_term) {
 
         item_node = item_node->next;
     }
-    //returns the result
     return results;
 }
 
@@ -35,7 +35,7 @@ item_t *compare_item(store_t *store[], char *search_term, size_t length_of_store
     item_t *cheapest_item = find_cheapest_match(store[0], search_term);
     for (int i = 1; i < length_of_store; i++) {
         item_t *temp_match = find_cheapest_match(store[i], search_term);
-        if (cmp_item_price(cheapest_item, temp_match)) {
+        if (temp_match != NULL && (cmp_item_price(cheapest_item, temp_match) || cheapest_item == NULL)) {
             cheapest_item = temp_match;
         }
     }
@@ -51,53 +51,36 @@ item_t *different_items(store_t *store[], char *search_term[], size_t length_of_
     return products;
 }
 
-void mads_is_a_PDF_FILE(){
-    char *nigger = "Mads Likes Even Bigger Cocks";
-    char *woman_mads_like = " ";
-    char* split_up = strtok(nigger, woman_mads_like);
-
-    printf("%s\n", split_up);
-
-    while(*split_up != 0){
-        split_up = strtok(NULL, woman_mads_like);
-        printf("%s\n", split_up);
+int cmp_amount(item_t item, amount_t UI){
+    if (item.amount == NULL) {
+        return UI.amount;
     }
-}
-
-
-amount_t *find_amount(char *unit_amount) {
-    amount_t *app = malloc(sizeof(amount_t));
-    const char n[2] = " ";
-        //for (int i = 0; i < input_of_amount; ++i) {
-    char *a = strtok(unit_amount, n);
-    app->amount = atof(a);
-    a = strtok(NULL, n);
-    app->unit_type = look_for_enumtype(a);
-    printf("%lf\n\n%d", app->amount, app->unit_type);
-   // }
-    return app;
-}
- int look_for_enumtype(char* str) {
-    int amount = -1;
-    if(strcmp(str, "GRAMS") == 0){
-        amount = GRAMS;
-    } else if(strcmp(str, "LITERS") == 0){
-        amount = LITERS;
-    } else if (strcmp(str, "PIECES") == 0){
-        amount = PIECES;
+    int n = ceil(UI.amount / item.amount->amount);
+    if(n < 1){
+        return 1;
+    } else if(n > 1){
+        return n;
     }
-    return amount;
+
+
 }
 
-
-
-
-void print_item(store_t *store[], char *search_term[], size_t length_of_store, size_t input_of_product) {
+void print_item(store_t *store[], char *search_term[], char *amounts[], size_t length_of_store, size_t input_of_product) {
     item_t *products =  different_items(store, search_term, length_of_store, input_of_product);
     printf("Your cheapest match is the following:\n");
     for(int i = 0; i < input_of_product; i++) {
-        printf("%s: %lf DKK, %lf %d \n", products[i].name, get_item_price(&products[i]));
-        printf("On the following product, you save exactly %lf DKK\n\n", products[i].price - get_item_price(&products[i]));
+        amount_t *amount = find_amount_from_string(amounts[i]);
+        if (amount == NULL) {
+            fprintf(stderr, "sus %s: %s\n", products[i].name, amounts[i]);
+            continue;
+        }
+        printf("You need %d x %.2lf %s %s , where each product will cost %.2lf DKK\n", cmp_amount(products[i],
+                                                                                        *amount),
+                                                                                (products[i].amount != NULL) ? products[i].amount->amount : 1,
+                                                                                get_unit_name(amount->unit_type),
+                                                                                products[i].name,
+                                                                                get_item_price(&products[i]));
+        printf("On the following product, you'll save exactly %lf DKK\n\n", products[i].price - get_item_price(&products[i]));
     }
     free(products);
 }

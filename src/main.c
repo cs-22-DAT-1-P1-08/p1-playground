@@ -2,7 +2,6 @@
 #include "store.h"
 #include "api/tjek_api.h"
 #include "sorting_functions.h"
-#include <string.h>
 
 int main() {
     printf("Started program...\n");
@@ -11,16 +10,12 @@ int main() {
     store_t *stores[] = {daglibrugsen,
                          coop365};
     // Grænseflade implementation
-    char *search_term[] = {"SMOERBAR", "CHIP", "AGURK"};
-    char *amount = "700 GRAMS ";
+    char *search_term[] = {"SMOERBAR", "SALT", "AGURK"};
+    char *amount[] = {"700 GRAM", "600 GRAM", "2 STK"};
 
 
-    //mads_is_a_PDF_FILE();
-
-
-    //find_amount(amount);
     //Output
-    print_item(stores, search_term, 2, 3);
+    print_item(stores, search_term, amount, 2, 3);
 
     free_store(daglibrugsen);
     free_store(coop365);
