@@ -2,9 +2,16 @@
 #define RESULTS_VIEW_H
 
 #include <curses.h>
+#include "../util/dlist.h"
+#include "../store.h"
 
 typedef struct results_view_data_t {
-
+    dlist_t *shopping_list;
+    store_t **stores;
+    size_t store_count;
+    location_t home;
 } results_view_data_t;
+
+int render_results_view(WINDOW *window, results_view_data_t *data);
 
 #endif

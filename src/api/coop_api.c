@@ -182,8 +182,21 @@ amount_t* find_amount_from_string(char* input_str){
     return result;
 }
 
+char* get_amount_string(amount_t *amount) {
+    if (amount == NULL)
+        return "";
+
+    char temp[100] = { 0 };
+    sprintf(temp, "%.1lf %s", amount->amount, get_unit_name(amount->unit_type));
+
+    char *result = calloc(strlen(temp) + 1, sizeof(char));
+    strcpy(result, temp);
+
+    return result;
+}
+
 const char* get_unit_name(enum AmountUnit unit) {
-    static const char* names[] = { "grams", "liters", "pieces"};
+    static const char* names[] = { "gram", "liter", "stk"};
     return names[unit];
 }
 

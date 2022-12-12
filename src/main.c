@@ -4,11 +4,18 @@
 #include "api/location_api.h"
 #include "ui/main_view.h"
 #include "ui/shopping_list_view.h"
+#include "ui/results_view.h"
 #include "sorting_functions.h"
 #include "store.h"
 #include <stdlib.h>
+#include <string.h>
 
 int main() {
+    store_t *daglibrugsen = get_coop_store("Dagli'Brugsen", "1290", DB_DEALER_ID);
+    store_t *coop365 = get_coop_store("Coop 365", "24165", COOP365_DEALER_ID);
+
+    store_t *stores[] = { daglibrugsen, coop365 };
+
     initscr();
     noecho();
 
@@ -22,21 +29,33 @@ int main() {
     render_main_view(main_view, &selected);
     destroy_main_view(main_view);
 
-
     if (selected == QUIT) {
         return 0;
     }
 
-    // Assume shopping list for now
     dlist_t *shopping_list = calloc(1, sizeof(dlist_t));
     render_shopping_list(stdscr, shopping_list);
+
+    results_view_data_t *result_data = calloc(1, sizeof(results_view_data_t));
+    result_data->shopping_list = shopping_list;
+    result_data->stores = stores;
+    result_data->store_count = sizeof(stores) / sizeof(stores[0]),
+
+    render_results_view(stdscr, result_data);
+
+
     printw("Shopping list length: %d\n", shopping_list->count);
     for (int i = 0; i < shopping_list->count; i++) {
         printw(" - %s\n", dlist_get_at(shopping_list, i)->data);
     }
 
+
+
     getch();
     endwin();
+
+    free_store(daglibrugsen);
+    free_store(coop365);
     return 0;
     
     printf("Started program...\n");
@@ -71,10 +90,6 @@ int main() {
     strcpy(home.postalCode, "9000");
     strcpy(home.place_name, "home");
     addr_to_geo(&home, here_api_key);
-
-    // Prepare stores
-    store_t *daglibrugsen = get_coop_store("Dagli'Brugsen", "1290", DB_DEALER_ID);
-    store_t *coop365 = get_coop_store("Coop 365", "24165", COOP365_DEALER_ID);
 
     // Fill store locations
     fill_nearest_store(daglibrugsen, &home);

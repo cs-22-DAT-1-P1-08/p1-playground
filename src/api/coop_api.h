@@ -19,6 +19,7 @@ typedef struct{
 } amount_t;
 
 amount_t* find_amount_from_string(char* input_str);
+char* get_amount_string(amount_t *amount);
 const char* get_unit_name(enum AmountUnit unit);
 
 /**
