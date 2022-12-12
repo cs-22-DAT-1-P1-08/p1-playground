@@ -55,7 +55,7 @@ int main() {
     print_item(stores, search_term, amount, 2, 3);*/
     
 
-    // Retrieve HERE API key
+    //Retrieve HERE API key
     char* here_api_key = getenv("HERE_API_KEY");
     if (here_api_key == NULL) {
         fprintf(stderr, "Failed to retrieve HERE_API_KEY from environment variables.");

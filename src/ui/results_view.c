@@ -1,6 +1,7 @@
 #include "results_view.h"
 #include <curses.h>
 #include <stdlib.h>
+#include <string.h>
 
 /*
 //a struct for fake data
