@@ -7,11 +7,6 @@
 #include "sorting_functions.h"
 #include "store.h"
 #include <stdlib.h>
-#include <curl/curl.h>
-#include <json-c/json.h>
-#include <locale.h>
-#include <wchar.h>
-#include <curses.h>
 
 int main() {
     initscr();
@@ -68,9 +63,9 @@ int main() {
     }
 
     // Fill home location
-    geocode home;
+    location_t home;
 
-    initialize_geocode(&home);
+    initialize_location(&home);
     strcpy(home.street, "Hadsundvej");
     strcpy(home.houseNumber, "44");
     strcpy(home.postalCode, "9000");
