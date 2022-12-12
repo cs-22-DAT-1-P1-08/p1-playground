@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include "sorting_functions.h"
 #include "api/coop_api.h"
 #include "store.h"

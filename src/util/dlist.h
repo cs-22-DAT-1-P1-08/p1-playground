@@ -40,12 +40,27 @@ dlist_t* dlist_add_tail(dlist_t *dlist, void *data);
 dlist_t* dlist_add(dlist_t *dlist, void *data);
 
 /**
+ * Get data from specific index in doubly linked list
+ * @param int index of element to be retrieved
+ * @return List pointer
+ */
+dlist_node_t* dlist_get_at(dlist_t *dlist, int index);
+
+/**
  * Removes node from doubly linked list (does not free data, only node itself)
  * @param dlist Doubly linked list
  * @param node Node to be removed
  * @return Data from removed node
  */
 void* dlist_remove(dlist_t *dlist, dlist_node_t *node);
+
+/**
+ * Removes node from doubly linked list at index (does not free data, only node itself)
+ * @param dlist Doubly linked list
+ * @param index Index of node to be removed
+ * @return Data from removed node
+ */
+void* dlist_remove_at(dlist_t *dlist, int index);
 
 /**
  * Removes first node (head) from doubly linked list (does not free data, only node itself)
