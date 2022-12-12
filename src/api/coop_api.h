@@ -14,8 +14,8 @@ enum AmountUnit {
 };
 
 typedef struct amount_t {
-    enum AmountUnit unit_type;
     double amount;
+    enum AmountUnit unit_type;
 } amount_t;
 
 amount_t* find_amount_from_string(char* input_str);

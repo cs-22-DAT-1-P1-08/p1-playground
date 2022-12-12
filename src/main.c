@@ -11,8 +11,14 @@ int main() {
     store_t *stores[] = {daglibrugsen,
                          coop365};
     // Grænseflade implementation
-    char *search_term[] = {"SMOERBART", "MANDLER", "AGURK"};
+    char *search_term[] = {"SMOERBAR", "CHIP", "AGURK"};
+    char *amount = "700 GRAMS ";
 
+
+    //mads_is_a_PDF_FILE();
+
+
+    //find_amount(amount);
     //Output
     print_item(stores, search_term, 2, 3);
 

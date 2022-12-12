@@ -4,6 +4,7 @@
 #include <string.h>
 #include "sorting_functions.h"
 #include <curl/curl.h>
+#include <stdlib.h>
 
 //compares results to the new item found in the list
 int cmp_item_price(item_t *a, item_t *b) {
@@ -50,11 +51,53 @@ item_t *different_items(store_t *store[], char *search_term[], size_t length_of_
     return products;
 }
 
-void print_item(store_t *store[], char *search_term[], size_t length_of_store, size_t length_of_input) {
-    item_t *products =  different_items(store, search_term, length_of_store, length_of_input);
+void mads_is_a_PDF_FILE(){
+    char *nigger = "Mads Likes Even Bigger Cocks";
+    char *woman_mads_like = " ";
+    char* split_up = strtok(nigger, woman_mads_like);
+
+    printf("%s\n", split_up);
+
+    while(*split_up != 0){
+        split_up = strtok(NULL, woman_mads_like);
+        printf("%s\n", split_up);
+    }
+}
+
+
+amount_t *find_amount(char *unit_amount) {
+    amount_t *app = malloc(sizeof(amount_t));
+    const char n[2] = " ";
+        //for (int i = 0; i < input_of_amount; ++i) {
+    char *a = strtok(unit_amount, n);
+    app->amount = atof(a);
+    a = strtok(NULL, n);
+    app->unit_type = look_for_enumtype(a);
+    printf("%lf\n\n%d", app->amount, app->unit_type);
+   // }
+    return app;
+}
+ int look_for_enumtype(char* str) {
+    int amount = -1;
+    if(strcmp(str, "GRAMS") == 0){
+        amount = GRAMS;
+    } else if(strcmp(str, "LITERS") == 0){
+        amount = LITERS;
+    } else if (strcmp(str, "PIECES") == 0){
+        amount = PIECES;
+    }
+    return amount;
+}
+
+
+
+
+void print_item(store_t *store[], char *search_term[], size_t length_of_store, size_t input_of_product) {
+    item_t *products =  different_items(store, search_term, length_of_store, input_of_product);
     printf("Your cheapest match is the following:\n");
-    for(int i = 0; i < length_of_input; i++) {
-        printf("%s: %lf DKK\n", products[i].name, get_item_price(&products[i]));
+    for(int i = 0; i < input_of_product; i++) {
+        printf("%s: %lf DKK, %lf %d \n", products[i].name, get_item_price(&products[i]));
+        printf("On the following product, you save exactly %lf DKK\n\n", products[i].price - get_item_price(&products[i]));
     }
     free(products);
 }
