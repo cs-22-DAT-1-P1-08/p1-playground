@@ -17,5 +17,8 @@ set(libcurl_LIBRARY "${libcurl_DIR}/lib/libcurl.dll.a")
 
 include_directories(${libcurl_INCLUDE_DIR})
 
+enable_testing()
+
+add_subdirectory(test_prog)
 add_subdirectory(src)
 add_subdirectory(lib-examples)
