@@ -8,26 +8,41 @@
 #include <stdlib.h>
 #include <math.h>
 
+char* to_lowercase(char* input_str) {
+    char* result = calloc(strlen(input_str) + 1, sizeof(char));
+    for (int i = 0; i < strlen(input_str); i++) {
+        result[i] = (char)tolower(input_str[i]);
+    }
+    return result;
+}
+
+
 //compares results to the new item found in the list
 int cmp_item_price(item_t *a, item_t *b) {
     return get_item_price(a) > get_item_price(b);
 }
 
 item_t *find_cheapest_match(store_t *store, char *search_term) {
+    char* lower_search_term = to_lowercase(search_term);
+
     dlist_node_t *item_node = store->products->head;
     item_t *results = NULL;
     while (item_node != NULL) {
         item_t *item = item_node->data;
-        // TODO: make string comparison case insensitive
-        if (item != NULL && strstr(item->name, search_term) != NULL) {
+
+        char* item_name = to_lowercase(item->name);
+        if (strstr(item_name, lower_search_term) != NULL) {
             // compares "results" with they knew item, which has the same string
             if (results == NULL || cmp_item_price(results, item)) {
                 results = item;
             }
         }
 
+        free(item_name);
         item_node = item_node->next;
     }
+
+    free(lower_search_term);
     return results;
 }
 
