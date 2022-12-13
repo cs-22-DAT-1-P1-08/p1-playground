@@ -31,14 +31,14 @@ item_t *find_cheapest_match(store_t *store, char *search_term) {
     return results;
 }
 
-item_t *compare_item(store_t *store[], char *search_term, size_t length_of_store)
-{
+item_t *compare_item(store_t *store[], char *search_term, size_t length_of_store) {
     item_t *cheapest_item = find_cheapest_match(store[0], search_term);
     for (int i = 1; i < length_of_store; i++) {
         item_t *temp_match = find_cheapest_match(store[i], search_term);
-        if (temp_match != NULL && (cmp_item_price(cheapest_item, temp_match) || cheapest_item == NULL)) {
+        if (temp_match != NULL && (cheapest_item == NULL || cmp_item_price(cheapest_item, temp_match))) {
             cheapest_item = temp_match;
         }
+
     }
     return cheapest_item;
 }

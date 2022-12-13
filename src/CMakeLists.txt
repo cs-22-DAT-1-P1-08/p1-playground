@@ -14,6 +14,10 @@ set(SOURCES
     ${CMAKE_CURRENT_LIST_DIR}/ui/components/arrow_menu.c
 )
 
-add_executable(p1_playground main.c ../test_prog/test.c)
+add_executable(p1_playground main.c)
 target_sources(p1_playground PRIVATE ${SOURCES})
 target_link_libraries(p1_playground json-c::json-c pdcurses::pdcurses ${libcurl_LIBRARY})
+
+#add_library(p1_library)
+#target_sources(p1_library PRIVATE ${SOURCES})
+#target_link_libraries(p1_library json-c::json-c pdcurses::pdcurses ${libcurl_LIBRARY})
