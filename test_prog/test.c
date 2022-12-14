@@ -20,9 +20,9 @@ int main(void) {
                              "SMOOTHIE BOWL", "JUICE", "COCKTAIL", "KAFFE", "TE", "ESPRESSO",
                              "CAPPUCCINO", "LATTE", "MOKKA", "CHAI LATTE"};
 
-    char *grocery_case[] = {"kylling bryst", "1 KG", "guleroedder", "4 KG", "havregryn", "500 G",
-                            "bananer", "8 STK","blaabaerd", "500 G", "sodavand", "4 L",
-                            "revet ost", "1 KG","ost", "300 G", "tortillas", "8 STK",
+    char *grocery_case[] = {"kyllingebryst", "1 KG", "guleroedder", "4 KG", "havregryn", "500 G",
+                            "bananer", "8 STK","blaabaer", "500 G", "sodavand", "4 L",
+                            "revet ost", "1 KG","ost", "300 G", "tortilla", "8 STK",
                             "slik", "1 KG", "agurker", "2 STK", "pasta", "1 KG",
                            "syltetoej", "300 G", "kartofler", "3 KG","smoer", "600 G",
                            "gris", "1 KG","hakket oksekoed", "800 G", "aeg", "20 STK",
@@ -41,6 +41,7 @@ int main(void) {
                             "fiske fillet"};*/
     int bool_fail = 0;
 
+    double sum = 0;
     for (int i = 0; i < 58; i += 2) {
         amount_t *amount = find_amount_from_string(grocery_case[i+1]);
 
@@ -50,12 +51,28 @@ int main(void) {
             printf("\033[1;31m%s failed\n", temp_grocery);
             bool_fail = 1;
         }
-        else if (amount != NULL && temp_item->amount != NULL)
-            printf("\033[1;32m%s passed as %d * %.2lf %s: %s\n", temp_grocery,
-                   cmp_amount(*temp_item, *amount), temp_item->amount->amount, get_unit_name(temp_item->amount->unit_type), temp_item->name);
-
-        else printf("\033[1;32m%s passed as %s\n", temp_grocery, temp_item->name);
+        else if (amount != NULL && temp_item->amount != NULL) {
+            int product_amount = cmp_amount(*temp_item, *amount);
+            printf("\033[1;32m%-15s passed as %2d * %7.2lf %-6s: %-30s \t costing %2d * %.2lf,-\n",
+                   temp_grocery, product_amount,
+                   temp_item->amount->amount,
+                   get_unit_name(temp_item->amount->unit_type),
+                   temp_item->name,
+                   product_amount,
+                   get_item_price(temp_item));
+            sum += get_item_price(temp_item) * product_amount;
+        }
+        else {
+            printf("\033[1;32m%-15s passed as                    : %-30s \t costing      %.2lf,-\n",
+                   temp_grocery,
+                   temp_item->name,
+                   get_item_price(temp_item));
+            sum += get_item_price(temp_item);
+        }
     }
+    printf("\033[1;32m------------------------------------------------------------------------------------------------------\n");
+    printf("\033[1;32m Sum of products                                                              \t costing      %7.2lf,-", sum);
+
     free_store(daglibrugsen);
     free_store(coop365);
     return bool_fail;
