@@ -18,6 +18,7 @@ typedef struct {
     catalog_info_t* catalog_info;
 } store_t;
 
+store_t link_offer_data(store_t* store);
 store_t* get_coop_store(char* store_name, char* store_id, char* dealer_id);
 
 /**
