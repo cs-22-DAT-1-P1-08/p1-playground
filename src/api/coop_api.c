@@ -138,6 +138,10 @@ amount_t* find_amount_from_string(char* input_str){
 
         memcpy(word, &input_str[start_index], len);
 
+        // Convert word to uppercase for comparison
+        for (int j = 0; j < len; j++)
+            word[j] = (char)toupper(word[j]);
+
         /* Handle unit or multiplier keywords */
         if (strcmp(word, "G") == 0 || strcmp(word, "GRAM") == 0) {
             result->unit_type = GRAMS;
