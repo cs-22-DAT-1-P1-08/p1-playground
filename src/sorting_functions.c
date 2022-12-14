@@ -19,9 +19,19 @@ char* to_lowercase(char* input_str) {
 
 //compares results to the new item found in the list
 int cmp_item_price(item_t *a, item_t *b) {
-    return get_item_price(a) > get_item_price(b);
+    if(a->amount == NULL || b->amount == NULL || a->amount->unit_type == PIECES && b->amount->unit_type != PIECES || b->amount->unit_type == PIECES && a->amount->unit_type != PIECES){
+        return(get_item_price(a)) > (get_item_price(b));
+    } else if (a->amount->unit_type == b->amount->unit_type) {
+        return (get_item_price(a) / a->amount->amount) > (get_item_price(b) / b->amount->amount);
+    } else {
+        if(a->amount->unit_type == LITERS && b->amount->unit_type == GRAMS) {
+            return (get_item_price(a) / (a->amount->amount * 1000)) > (get_item_price(b) / b->amount->amount);
+        }
+        if(a->amount->unit_type == GRAMS && b->amount->unit_type == LITERS) {
+            return (get_item_price(a) / a->amount->amount) > (get_item_price(b) / b->amount->amount * 1000);
+        }
+    }
 }
-
 item_t *find_cheapest_match(store_t *store, char *search_term) {
     char* lower_search_term = to_lowercase(search_term);
 
@@ -67,18 +77,15 @@ item_t *different_items(store_t *store[], char *search_term[], size_t length_of_
     return products;
 }
 
-int cmp_amount(item_t item, amount_t UI){
+int cmp_amount(item_t item, amount_t UI) {
     if (item.amount == NULL) {
-        return UI.amount;
+        return (int) UI.amount;
     }
     int n = ceil(UI.amount / item.amount->amount);
-    if(n < 1){
+    if (n <= 1) {
         return 1;
-    } else if(n > 1){
+    } else
         return n;
-    }
-
-
 }
 
 void print_item(store_t *store[], char *search_term[], char *amounts[], size_t length_of_store, size_t input_of_product) {
@@ -90,12 +97,12 @@ void print_item(store_t *store[], char *search_term[], char *amounts[], size_t l
             fprintf(stderr, "sus %s: %s\n", products[i].name, amounts[i]);
             continue;
         }
-        printf("You need %d x %.2lf %s %s , where each product will cost %.2lf DKK\n", cmp_amount(products[i],
-                                                                                        *amount),
-                                                                                (products[i].amount != NULL) ? products[i].amount->amount : 1,
-                                                                                get_unit_name(amount->unit_type),
-                                                                                products[i].name,
-                                                                                get_item_price(&products[i]));
+        printf("You need %d x %.2lf %s %s , where each product will cost %.2lf DKK\n",
+               cmp_amount(products[i],*amount),
+               (products[i].amount != NULL) ? products[i].amount->amount : 1,
+               (products[i].amount != NULL) ? get_unit_name(products[i].amount->unit_type) : get_unit_name(amount->unit_type),
+               products[i].name,
+               get_item_price(&products[i]));
         printf("On the following product, you'll save exactly %lf DKK\n\n", products[i].price - get_item_price(&products[i]));
     }
     free(products);
