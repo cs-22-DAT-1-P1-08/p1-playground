@@ -16,6 +16,12 @@ void render_shopping_list(WINDOW *window, dlist_t* shopping_list) {
 
     while (is_done == false) {
         wclear(window);
+        wprintw(window, "-------------------------------------------------\n");
+        wprintw(window, "-                  Shopping list                -\n");
+        wprintw(window, "-------------------------------------------------\n");
+        wprintw(window, "Please fill in a list of items. The amount can\n");
+        wprintw(window, "be specified as part of the text, e.g. 500 gram.\n");
+        wprintw(window, "-------------------------------------------------\n");
 
         for (int i = 0; i < shopping_list->count; i++) {
             attron(COLOR_PAIR(1));
@@ -24,7 +30,8 @@ void render_shopping_list(WINDOW *window, dlist_t* shopping_list) {
             wprintw(window, "%s\n", (char*)dlist_get_at(shopping_list, i)->data);
         }
 
-        wprintw(window, "---------------------\n");
+        if (shopping_list->count > 0)
+            wprintw(window, "-------------------------------------------------\n");
         int menu_result = render_menu(window, menu, sizeof(menu) / sizeof(menu[0]));
 
         switch (menu_result) {
