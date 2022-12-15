@@ -147,17 +147,15 @@ int *route_time(location_t *places, char *transportation, char *apikey, size_t p
     char url[1000] = "https://router.hereapi.com/v8/routes?";
     add_if_api(url, apikey);
 
-    // Checks if the locations in places isn't entirely empty, else the prgram is stopped
     for (int i = 0; i < places_len; ++i) {
+        // calls are made so the missing information in all the location in places are filled
+        if (strncmp("home", places[i].place_name, 4)== 0) addr_to_geo(&places[i], apikey);
+        else store_to_geo(&places[i], apikey, places[0].lat, places[0].lng);
+
         if (is_addr_empty(&places[i])) {
-            printf("ERROR an address was entirely empty");
+            printf("ERROR an address was entirely empty adter it should be filled");
             exit(EXIT_FAILURE);
         }
-
-        // calls are made so the missing information in all the location in places are filled
-        else if (strcmp(places[i].place_name, places[0].place_name) == 0);
-        else if (strncmp("home", places[i].place_name, 4)== 0) addr_to_geo(&places[i], apikey);
-        else store_to_geo(&places[i], apikey, places[0].lat, places[0].lng);
     }
     for (int i = 0; i < places_len; ++i) {
         if (i == 0) strcat(url, "origin=");

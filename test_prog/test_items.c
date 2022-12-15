@@ -93,6 +93,7 @@ int main(void) {
     return bool_fail;
 }
 
+
 store_t* get_store_time_test(char* store_name, char* store_id, char* dealer_id) {
     printf("Initializing store: %s\n", store_name);
     store_t *store = calloc(1, sizeof(store_t));

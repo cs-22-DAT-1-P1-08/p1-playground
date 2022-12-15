@@ -41,17 +41,6 @@ void replace_address(location_t *place, json_object *address, int args,...);
 void fill_location (location_t *place, char *str, int item_num);
 
 /**
- * Switch case, which copies with strcpy on to the element of place which correlates with the iterator i
- * from the string str.
- *
- * @param place an element of struct location_t which get its element updated to str.
- * @param i decides which element is to be replaced with str.
- * @param str string is the source which an element is updated with.
- */
-
-void set_address (location_t *place, AddressComponent i, char *str);
-
-/**
  * Dives through the json object jobj to find the time of the entire route and between the individuel location_ts
  * in places.
  * @param jobj

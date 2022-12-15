@@ -96,5 +96,23 @@ void initialize_location(location_t *place);
  */
 char *get_address(location_t *place, AddressComponent i);
 
+/**
+ * Switch case, which copies with strcpy on to the element of place which correlates with the iterator i
+ * from the string str.
+ *
+ * @param place an element of struct location_t which get its element updated to str.
+ * @param i decides which element is to be replaced with str.
+ * 0: street.       \n
+ * 1: houseNumber.  \n
+ * 2: city.         \n
+ * 3: postalCode.   \n
+ * 4: county.       \n
+ * 5: state.        \n
+ * @param str string is the source which an element is updated with.
+ */
+
+void set_address (location_t *place, AddressComponent i, char *str);
+
+
 
 #endif //UNTITLED_API_H
