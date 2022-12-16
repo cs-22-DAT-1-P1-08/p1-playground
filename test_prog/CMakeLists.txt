@@ -23,7 +23,7 @@ target_link_libraries(test_item json-c::json-c pdcurses::pdcurses ${libcurl_LIBR
 target_link_libraries(test_location json-c::json-c pdcurses::pdcurses ${libcurl_LIBRARY})
 
 
-#add_test(NAME test_item
-#       COMMAND test_item)
+add_test(NAME test_item
+       COMMAND test_item)
 add_test(NAME test_location
         COMMAND test_location)

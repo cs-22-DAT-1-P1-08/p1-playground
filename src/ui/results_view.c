@@ -16,13 +16,13 @@ typedef struct {
 //Checks for the longest product name and changes the size of the box
 int check_longest_word(item_t *products2[], int size)
 {
-    int result;
+    int result = 0;
     int maxLength = 9;
-    char* word;
+    char* word = "";
 
     for (int i = 0; i < size; ++i)
     {
-        word = products2[i]->name;
+        word = (products2[i] != NULL) ? products2[i]->name : "";
         if (strlen(word) > maxLength)
             maxLength = strlen(word);
 
@@ -42,8 +42,8 @@ void lines(item_t *products2[], int row, int size)
 }
 
 int render_results_view(WINDOW *window, results_view_data_t *data) {
-    double total_price1;
-    double total_price2;
+    double total_price1 = 0;
+    double total_price2 = 0;
 
     char* store1_name = data->stores[0]->name;
     char* store2_name = data->stores[1]->name;
@@ -56,6 +56,7 @@ int render_results_view(WINDOW *window, results_view_data_t *data) {
     for (int i = 0; i < size * 2; i++) {
         products2[i] = find_cheapest_match(data->stores[i % 2], shopping_list[i / 2]);
     }
+
 
 
     int store_space1 = (int)((17-(strlen(store1_name) + 6)) / 2);
@@ -79,20 +80,26 @@ int render_results_view(WINDOW *window, results_view_data_t *data) {
     {
         mvprintw(2+i, 10, "|%s ", shopping_list[i / 2]);
 
-        if (products2[i] != NULL)
+        if (products2[i] != NULL) {
             mvprintw(2+i, 12 + longest_word_len, "| %.2lf kr (%s) ", get_item_price(products2[i]), get_amount_string(products2[i]->amount));
-        else
-            mvprintw(2+i, 12 + longest_word_len, " | N/A ");
+            total_price1 = total_price1 + get_item_price(products2[i]);
 
-        if (products2[i + 1] != NULL)
+        }
+        else {
+            mvprintw(2+i, 12 + longest_word_len, " | N/A ");
+        }
+
+        if (products2[i + 1] != NULL)  {
             mvprintw(2+i, 33 + longest_word_len, "| %.2lf kr (%s) ", get_item_price(products2[i + 1]), get_amount_string(products2[i + 1]->amount));
-        else
+            total_price2 = total_price2 + get_item_price(products2[i+1]);
+
+        }
+        else {
             mvprintw(2+i, 33 + longest_word_len, " | N/A ");
+        }
 
         mvprintw(2+i, 54 + longest_word_len, "|");
 
-        total_price1 = total_price1 + get_item_price(products2[i]);
-        total_price2 = total_price2 + get_item_price(products2[i+1]);
         i += 2;
     }
 

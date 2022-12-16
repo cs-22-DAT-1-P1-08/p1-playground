@@ -47,6 +47,8 @@ void render_shopping_list(WINDOW *window, dlist_t* shopping_list) {
                 char input[50];
                 getstr(input);
 
+                //if (strlen) indsætte en if statement hvis input ikke er noget, returnes der ikke noget.
+
                 // Convert to char pointer
                 char *new_item = calloc(strlen(input) + 1, sizeof(char));
                 strcpy(new_item, input);
