@@ -12,6 +12,7 @@ store_t* get_store_time_test(char* store_name, char* store_id, char* dealer_id);
 
 int main(void) {
 
+
     clock_t begin = clock();
     store_t *daglibrugsen = get_store_time_test("Dagli'Brugsen", "1290", DB_DEALER_ID);
     store_t *coop365 = get_store_time_test("Coop 365", "24165", COOP365_DEALER_ID);
@@ -25,7 +26,7 @@ int main(void) {
     char *grocery_wares[] = {"MAELK", "BREAD", "SMOER", "AEG", "HVIDLOEG", "LOEG", "GULEROEDDER",
                              "KARTOFLER", "TOMATER", "SALAT", "BOENNER", "LINSER", "RIS",
                              "KOED", "FISK", "KYLLING", "SKINK", "LEVERPOSTEJ", "OST",
-                             "YOGHURT", "FLOEDE OST" "SMOOTHIE", "SAFT", "VAND", "COCA COLA",
+                             "YOGHURT", "FLOEDE OST", "SMOOTHIE", "SAFT", "VAND", "COCA COLA",
                              "OEL", "VIN", "KRYDDERIER", "BAGEINGREDIENSER", "SNACKS",
                              "NOEDDER", "FRUGT", "GROENTSAGER", "KONSERVER", "DRESSING",
                              "MARINADE", "SAUCE", "KETCHUP", "SENNEP", "CHOKOLADE",

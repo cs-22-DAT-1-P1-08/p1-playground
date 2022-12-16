@@ -6,7 +6,13 @@
 #include "api/coop_api.h"
 #include "store.h"
 
+char* to_lowercase(char* input_str);
+
 int cmp_item_price(item_t *a, item_t *b);
+
+dlist_t *split_input(char *search_term);
+
+int cmp_user_friendliness(char *item, dlist_t *search_term);
 
 item_t *find_cheapest_match(store_t *store, char *search_term);
 

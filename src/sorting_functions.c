@@ -34,16 +34,48 @@ int cmp_item_price(item_t *a, item_t *b) {
         }
     }
 }
+
+dlist_t *split_input(char *search_term) {
+    char delimiter[] = " ";
+    char *temp_str = strtok(search_term, delimiter);
+    dlist_t *str_output = calloc(1, sizeof(dlist_t));
+    dlist_add(str_output, temp_str);
+    int i = 0;
+    while(temp_str != NULL){
+        temp_str = strtok(NULL, delimiter);
+        if(temp_str != NULL){
+            dlist_add(str_output, temp_str);
+            i++;
+        }
+    }
+    return str_output;
+}
+
+int cmp_user_friendliness(char *item, dlist_t *search_term){
+    int results = 0;
+    for (int i = 0; i < search_term->count; ++i) {
+        char * temp_term = (char*) (dlist_get_at(search_term, i)->data);
+        if(strstr(item, temp_term)) {
+            results++;
+        }
+    }
+
+    return results;
+}
+
 item_t *find_cheapest_match(store_t *store, char *search_term) {
     char* lower_search_term = to_lowercase(search_term);
-
     dlist_node_t *item_node = store->products->head;
+    dlist_t *str_output = split_input(lower_search_term);
     item_t *results = NULL;
+    int search_hits = 1;
     while (item_node != NULL) {
         item_t *item = item_node->data;
-
         char* item_name = to_lowercase(item->name);
-        if (strstr(item_name, lower_search_term) != NULL) {
+        //if (strstr(item_name, lower_search_term) != NULL) {
+        int temp_search_hits = cmp_user_friendliness(item_name, str_output);
+        if (temp_search_hits >= search_hits) {
+            search_hits = temp_search_hits;
             // compares "results" with they knew item, which has the same string
             if (results == NULL || cmp_item_price(results, item)) {
                 results = item;
@@ -54,6 +86,7 @@ item_t *find_cheapest_match(store_t *store, char *search_term) {
         item_node = item_node->next;
     }
 
+    dlist_free(str_output);
     free(lower_search_term);
     return results;
 }
