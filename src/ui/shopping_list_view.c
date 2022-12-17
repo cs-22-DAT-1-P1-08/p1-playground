@@ -4,6 +4,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+char* text_input_field(WINDOW *window);
+int integer_input_field(WINDOW *window, int min, int max);
+
 void render_shopping_list(WINDOW *window, dlist_t* shopping_list) {
     menu_item_t menu[] = {
             { "Add item" },
@@ -34,88 +37,37 @@ void render_shopping_list(WINDOW *window, dlist_t* shopping_list) {
             wprintw(window, "-------------------------------------------------\n");
         int menu_result = render_menu(window, menu, sizeof(menu) / sizeof(menu[0]));
 
+        int item_number;
         switch (menu_result) {
             case 0: // Add item
                 wprintw(window, "\n\n");
                 wprintw(window, "Enter new item: ");
 
-                // Temporary terminal mode
-                curs_set(1);
-                echo();
-
-                // Get input
-                char input[50];
-                getstr(input);
-
-                //if (strlen) indsætte en if statement hvis input ikke er noget, returnes der ikke noget.
-
-                // Convert to char pointer
-                char *new_item = calloc(strlen(input) + 1, sizeof(char));
-                strcpy(new_item, input);
-
-                // Reset terminal mode
-                curs_set(0);
-                noecho();
-
-                dlist_add(shopping_list, new_item);
-                wrefresh(window);
+                dlist_add(shopping_list, text_input_field(window));
                 break;
             case 1: // Edit item
                 wprintw(window, "\n\n");
                 wprintw(window, "Enter item number: ");
 
-                // Temporary terminal mode
-                curs_set(1);
-                echo();
-
-                int item_number;
-                scanw(" %d", &item_number);
-                while (item_number < 1 || item_number >= shopping_list->count + 1) {
-                    wprintw(window, "You stupid! Try again: ");
-                    scanw(" %d", &item_number);
-                }
-
+                // Get item
+                item_number = integer_input_field(window, 1, (int)shopping_list->count);
                 dlist_node_t *line_node = dlist_get_at(shopping_list, item_number - 1);
                 char* line = line_node->data;
-                wprintw(window, "Editing item: %s\nNew item text: ", line);
 
                 // Get input
-                char edit_input[50];
-                getstr(edit_input);
+                wprintw(window, "Editing item: %s\nNew item text: ", line);
 
-                // Convert to char pointer
-                line_node->data = calloc(strlen(edit_input) + 1, sizeof(char));
-                strcpy(line_node->data, edit_input);
-
-                // Reset terminal mode
-                curs_set(0);
-                noecho();
-
-                wrefresh(window);
+                free(line_node->data);
+                line_node->data = text_input_field(window);
                 break;
-            case 2: // remove item
+            case 2: // Remove item
                 wprintw(window, "\n\n");
                 wprintw(window, "Enter item number: ");
 
-                // Temporary terminal mode
-                curs_set(1);
-                echo();
-
-                int remove_item_number;
-                scanw(" %d", &remove_item_number);
-                while (remove_item_number < 1 || remove_item_number >= shopping_list->count + 1) {
-                    wprintw(window, "You stupid! Try again: ");
-                    scanw(" %d", &remove_item_number);
-                }
-
-                dlist_remove_at(shopping_list, remove_item_number - 1);
-
-                // Reset terminal mode
-                curs_set(0);
-                noecho();
-
-                wrefresh(window);
+                item_number = integer_input_field(window, 1, (int)shopping_list->count);
+                dlist_remove_at(shopping_list, item_number - 1);
                 break;
+            default:
             case 3:
                 is_done = true;
                 break;
@@ -126,4 +78,46 @@ void render_shopping_list(WINDOW *window, dlist_t* shopping_list) {
 
     wclear(window);
     wrefresh(window);
+}
+
+char* text_input_field(WINDOW *window) {
+    // Temporary terminal mode
+    int prev_cursor_state = curs_set(1);
+    echo();
+
+    /* Get raw input */
+    char input[50];
+    wgetstr(window, input);
+
+    /* Allocate to heap memory */
+    char *result = calloc(strlen(input) + 1, sizeof(char));
+    strcpy(result, input);
+
+    /* Reset terminal mode */
+    curs_set(prev_cursor_state);
+
+    // "echo state" does not have a getter, we assume that previous state was noecho
+    noecho();
+
+    return result;
+}
+
+int integer_input_field(WINDOW *window, int min, int max) {
+    // Temporary terminal mode
+    int prev_cursor_state = curs_set(1);
+    echo();
+
+    int item_number;
+    scanw(" %d", &item_number);
+    while (item_number < min || item_number > max) {
+        wprintw(window, "Invalid input! Try again: ");
+        scanw(" %d", &item_number);
+    }
+
+    /* Reset terminal mode */
+    curs_set(prev_cursor_state);
+
+    // "echo state" does not have a getter, we assume that previous state was noecho
+    noecho();
+    return item_number;
 }
