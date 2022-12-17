@@ -65,7 +65,7 @@ void render_shopping_list(WINDOW *window, dlist_t* shopping_list) {
                 wprintw(window, "Enter item number: ");
 
                 item_number = integer_input_field(window, 1, (int)shopping_list->count);
-                dlist_remove_at(shopping_list, item_number - 1);
+                free(dlist_remove_at(shopping_list, item_number - 1));
                 break;
             default:
             case 3:
