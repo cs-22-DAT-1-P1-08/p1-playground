@@ -58,7 +58,7 @@ void addr_to_geo(location_t *place, char* apikey);
 void store_to_geo(location_t *store, char* apikey, char *lat, char *lng);
 
 /**
- * Uses libcurl to calculate the time between multiple different location_t elements,
+ * Uses libcurl to calculate the time or lengthbetween multiple different location_t elements,
  * both between the individual destinations and the entire route,
  * by the way of transportation chosen to get the string with the information a call to the api_to_str is made.
  * @param places an array of elements of the struct location_t.
@@ -72,9 +72,10 @@ void store_to_geo(location_t *store, char* apikey, char *lat, char *lng);
  * \n bus
  * @param apikey string which is used to get access to the here api.
  * @param places_len amount of destinations.
+ * @param output_duration if the output is wished to be the duration or the length of the route
  * @return
  */
-int *route_time(location_t *places, char *transportation, char* apikey, size_t places_len);
+int *route_time(location_t *places, char *transportation, char* apikey, size_t places_len, int output_duration);
 
 /**
  * Sets every string of the location_t struct place to an empty string.

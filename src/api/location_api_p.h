@@ -41,13 +41,13 @@ void replace_address(location_t *place, json_object *address, int args,...);
 void fill_location (location_t *place, char *str, int item_num);
 
 /**
- * Dives through the json object jobj to find the time of the entire route and between the individuel location_ts
+ * Dives through the json object jobj to find the time or length of the entire route and between the individuel location_ts
  * in places.
- * @param jobj
- * @param places
- * @param places_len
- * @return
+ * @param jobj is the json object which have the string being looked throgh
+ * @param places the destinations on the route which is updated with which number on the route they got
+ * @param places_len the amount of destinations on the route
+ * @return the travel time between the different destinations.
  */
-int *json_to_traveltime(json_object *jobj, location_t* places, size_t places_len);
+int *json_to_traveltime(json_object *jobj, location_t* places, size_t places_len, int output_duration);
 
 #endif //P1_PLAYGROUND_LOCATION_API_P_H

@@ -42,9 +42,9 @@ int main(void) {
                            "syltetoej", "300 G", "kartofler", "3 KG","smoer", "600 G",
                            "gris", "1 KG","hakket oksekoed", "800 G", "aeg", "20 STK",
                            "skyr", "1 KG", "leverpostej", "500 G","broed", "1 KG",
-                           "chokolade bar", "2 STK", "chips", "3 KG", "juice", "2 L",
+                           "chokoladebar", "2 STK", "chips", "3 KG", "juice", "2 L",
                            "musli", "350 G", "aebler", "1 KG", "floede is", "500 G",
-                           "maelk", "4 L","fiske fillet", "800 G"};
+                           "maelk", "4 L","fiskefillet", "800 G"};
 
     /*char *grocery_case[] = {"kylling bryst", "guleroedder" , "havregryn", "bananer",
                             "blaabaer", "sodavand", "revet ost", "ost",
