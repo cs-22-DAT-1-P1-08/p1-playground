@@ -12,6 +12,7 @@ set(SOURCES
     ${CMAKE_CURRENT_LIST_DIR}/ui/results_view.c
     ${CMAKE_CURRENT_LIST_DIR}/ui/shopping_list_view.c
     ${CMAKE_CURRENT_LIST_DIR}/ui/components/arrow_menu.c
+    ${CMAKE_CURRENT_LIST_DIR}/ui/components/table.c
 )
 
 add_executable(p1_playground main.c)
