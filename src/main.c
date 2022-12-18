@@ -15,14 +15,18 @@ int main() {
     store_t *coop365 = get_coop_store("Coop 365", "24165", COOP365_DEALER_ID);
 
     store_t *stores[] = { daglibrugsen, coop365 };
+
+    /*
     char *search[] = {"FLOEDE OST", "FLOEDE IS","FISKEFILET", "MEDISTER", "SADNESS"};
     char *a[] = {"100 GRAM", "1000 LITER", "500 GRAM", "200 GRAM", "1000 PIECES"};
 
     print_item(stores, search, a, 2, 5);
-    /*initscr();
+     */
+
+    initscr();
     noecho();
 
-    start_color();			 Start color
+    start_color();
     init_color(1, (short)(77.0/255.0*1000), (short)(128.0/255.0*1000), (short)(247.0/255.0*1000));
     init_pair(1, 1, COLOR_BLACK);
 
@@ -55,7 +59,7 @@ int main() {
 
 
     getch();
-    endwin(); */
+    endwin();
 
     free_store(daglibrugsen);
     free_store(coop365);
