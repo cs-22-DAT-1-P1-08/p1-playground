@@ -19,20 +19,25 @@ char* to_lowercase(char* input_str) {
 
 //compares results to the new item found in the list
 int cmp_item_price(item_t *a, item_t *b) {
-    if(a->amount == NULL || b->amount == NULL ||
-      (a->amount->unit_type == PIECES && b->amount->unit_type != PIECES) ||
-      (b->amount->unit_type == PIECES && a->amount->unit_type != PIECES)) {
-        return(get_item_price(a)) > (get_item_price(b));
-    } else if (a->amount->unit_type == b->amount->unit_type) {
-        return (get_item_price(a) / a->amount->amount) > (get_item_price(b) / b->amount->amount);
-    } else {
-        if(a->amount->unit_type == LITERS && b->amount->unit_type == GRAMS) {
-            return (get_item_price(a) / (a->amount->amount * 1000)) > (get_item_price(b) / b->amount->amount);
-        }
-        if(a->amount->unit_type == GRAMS && b->amount->unit_type == LITERS) {
-            return (get_item_price(a) / a->amount->amount) > (get_item_price(b) / b->amount->amount * 1000);
-        }
-    }
+    // It's not possible to compare amount between pieces and other unit types
+    if (a->amount == NULL || b->amount == NULL ||
+        a->amount->unit_type == PIECES ^ b->amount->unit_type == PIECES)
+        return get_item_price(a) > get_item_price(b);
+
+    if (a->amount->unit_type == b->amount->unit_type)
+        return (get_item_price(a) / a->amount->amount) >
+               (get_item_price(b) / b->amount->amount);
+
+    if (a->amount->unit_type == LITERS && b->amount->unit_type == GRAMS)
+        return (get_item_price(a) / (a->amount->amount * 1000)) >
+               (get_item_price(b) / b->amount->amount);
+
+    if (a->amount->unit_type == GRAMS && b->amount->unit_type == LITERS)
+        return (get_item_price(a) / a->amount->amount) >
+               (get_item_price(b) / b->amount->amount * 1000);
+
+    // Fallback scenario if specific case is not implemented
+    return get_item_price(a) > get_item_price(b);
 }
 
 dlist_t *split_input(char *search_term) {
