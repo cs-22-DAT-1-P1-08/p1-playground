@@ -1,5 +1,6 @@
 #include "results_view.h"
 #include "../sorting_functions.h"
+#include "components/table.h"
 #include <curses.h>
 #include <stdlib.h>
 #include <string.h>
@@ -12,6 +13,52 @@ typedef struct {
     double price;
     int distance;
 } demo_products;
+
+
+
+int render_results_view(WINDOW *window, results_view_data_t *data) {
+    table_t *table = init_table();
+
+    int size = (int)data->shopping_list->count;
+    int store_count = (int)data->store_count;
+
+    wprintw(window, "omegalul");
+    wrefresh(window);
+    return 0;
+
+    dlist_node_t *node;
+    int i, j;
+    for (i = 0, node = data->shopping_list->head; node != NULL; i++, node = node->next) {
+        char* list_entry = node->data;
+        char** row_data = calloc(store_count + 1, sizeof(char*));
+        row_data[0] = strdup(list_entry);
+
+        for (j = 0; j < size * store_count; j++) {
+            item_t *match = find_cheapest_match(data->stores[i % store_count], list_entry);
+
+            if (match) {
+                amount_t *amount = match->amount;
+
+                char amount_buf[50] = { 0 };
+                if (amount) sprintf(amount_buf, " (%.2lf %s)", amount->amount, get_unit_name(amount->unit_type));
+
+                char result_buf[255] = { 0 };
+                sprintf(result_buf, "%.2lf kr%s\n%s", match->price, amount_buf, match->name);
+
+                row_data[j + 1] = strdup(result_buf);
+            } else row_data[j + 1] = strdup("N/A");
+        }
+
+        table_add_row_array(table, ROW_SIMPLE, store_count + 1, row_data);
+    }
+
+    render_table(window, table);
+    wrefresh(window);
+
+    return 0;
+}
+
+/*
 
 //Checks for the longest product name and changes the size of the box
 int check_longest_word(item_t *products2[], int size)
@@ -123,4 +170,4 @@ int render_results_view(WINDOW *window, results_view_data_t *data) {
 
     lines(products2,6+i,size);
     mvprintw(6+i, 12+longest_word_len, "+--------------------+--------------------+\n\n");
-}
+}*/

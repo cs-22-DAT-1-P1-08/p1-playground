@@ -55,9 +55,11 @@ void render_table(WINDOW *window, table_t *table) {
     for (i = 0, row_node = table->m_rows->head; row_node != NULL; i++, row_node = row_node->next) {
         temp_row = row_node->data;
 
-        if ((temp_row->flags & ROW_BOLD) == ROW_BOLD) {
-            attron(attron(A_BOLD));
-        }
+        int is_bold = (temp_row->flags & ROW_BOLD) == ROW_BOLD;
+        int align_center = (temp_row->flags & ROW_ACENTER) == ROW_ACENTER;
+        int align_right = (temp_row->flags & ROW_ARIGHT) == ROW_ARIGHT;
+
+        if (is_bold) attron(attron(A_BOLD));
 
         offset_x = 0;
         offset_y += 1;
@@ -70,16 +72,21 @@ void render_table(WINDOW *window, table_t *table) {
             // Duplicate to avoid changing table data (strtok modifies string value)
             rest = temp_field = strdup(column_node->data);
 
-            for (k = 0; (line = strtok_r(rest, "\n", &rest)); k++)
-                mvwprintw(window, temp_y + k, temp_x, "%s", line);
+            for (k = 0; (line = strtok_r(rest, "\n", &rest)); k++) {
+                int align_offset = 0;
+                if (align_center || align_right) {
+                    align_offset = (int)(table->m_column_widths[j] - strlen(line));
+                    if (align_center) align_offset /= 2;
+                }
+
+                mvwprintw(window, temp_y + k, temp_x + align_offset, "%s", line);
+            }
 
             free(temp_field);
             offset_x += table->m_column_widths[j] + table->padding_x * 2;
         }
 
-        if ((temp_row->flags & ROW_BOLD) == ROW_BOLD) {
-            attroff(attron(A_BOLD));
-        }
+        if (is_bold) attroff(attron(A_BOLD));
 
         offset_y += table->m_row_heights[i] + table->padding_y * 2;
     }
@@ -116,6 +123,18 @@ void table_add_row(table_t *table, int flags, int n, ...) {
     dlist_add(table->m_rows, row);
 
     va_end(ptr);
+}
+
+void table_add_row_array(table_t *table, int flags, int n, char* arr[]) {
+    table_row_t *row = calloc(1, sizeof(table_row_t));
+    row->fields = calloc(1, sizeof(dlist_t));
+
+    row->flags = flags;
+
+    for (int i = 0; i < n; i++)
+        dlist_add(row->fields, arr[i]);
+
+    dlist_add(table->m_rows, row);
 }
 
 

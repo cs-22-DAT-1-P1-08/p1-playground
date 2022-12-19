@@ -4,13 +4,43 @@
 #include "api/location_api.h"
 #include "ui/main_view.h"
 #include "ui/shopping_list_view.h"
+#include "ui/components/table.h"
 #include "ui/results_view.h"
 #include "sorting_functions.h"
 #include "store.h"
 #include <stdlib.h>
 #include <string.h>
 
+int temp_table() {
+    initscr();
+    noecho();
+
+    start_color();
+    init_color(1, (short)(77.0/255.0*1000), (short)(128.0/255.0*1000), (short)(247.0/255.0*1000));
+    init_pair(1, 1, COLOR_BLACK);
+
+    table_t *table = init_table();
+    table->padding_x = 1;
+
+    table_add_row(table, ROW_BOLD | ROW_ACENTER, 3, "", "Foetex (0)", "SuperBrugsen (1)");
+    table_add_row(table, ROW_SIMPLE | ROW_ARIGHT, 3, "Minimaelk", "12.25 kr (1L)", "9.00 kr (1L)");
+    table_add_row(table, ROW_SIMPLE | ROW_ARIGHT, 3, "Rugbroed 500g", "6.00 kr (500G)", "7.50 kr (500G)");
+    table_add_row(table, ROW_SIMPLE | ROW_ARIGHT, 3, "Smoer 500g", "16.00 kr (200G)\nLurpak", "23.95 kr (200G)\nKaergarden");
+    table_add_row(table, ROW_SIMPLE | ROW_ARIGHT, 3, "CocaCola", "12.00 kr (1.5L)", "17.50 kr (1.5L)");
+    table_add_row(table, ROW_DEFAULT, 3, "Total", "46.25 kr", "57.95 kr");
+
+    render_table(stdscr, table);
+    wrefresh(stdscr);
+
+    free_table(table);
+
+    getch();
+    endwin();
+    return 0;
+}
+
 int main() {
+    //return temp_table();
     store_t *daglibrugsen = get_coop_store("Dagli'Brugsen", "1290", DB_DEALER_ID);
     store_t *coop365 = get_coop_store("Coop 365", "24165", COOP365_DEALER_ID);
 
