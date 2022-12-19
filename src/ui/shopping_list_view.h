@@ -5,5 +5,6 @@
 #include "../util/dlist.h"
 
 void render_shopping_list(WINDOW *window, dlist_t* shopping_list);
+char* text_input_field(WINDOW *window);
 
 #endif

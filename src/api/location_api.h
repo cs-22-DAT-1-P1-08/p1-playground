@@ -75,7 +75,7 @@ void store_to_geo(location_t *store, char* apikey, char *lat, char *lng);
  * @param output_duration if the output is wished to be the duration or the length of the route
  * @return
  */
-int *route_time(location_t *places, char *transportation, char* apikey, size_t places_len, int output_duration);
+int *route_time(location_t *places[], char *transportation, char* apikey, size_t places_len, int output_duration);
 
 /**
  * Sets every string of the location_t struct place to an empty string.
@@ -115,5 +115,6 @@ char *get_address(location_t *place, AddressComponent i);
 void set_address (location_t *place, AddressComponent i, char *str);
 
 
+int is_addr_empty(location_t *place);
 
 #endif //UNTITLED_API_H

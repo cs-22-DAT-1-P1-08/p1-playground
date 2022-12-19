@@ -1,6 +1,7 @@
 #include "results_view.h"
 #include "../sorting_functions.h"
 #include "components/table.h"
+#include "components/arrow_menu.h"
 #include <curses.h>
 #include <stdlib.h>
 #include <string.h>
@@ -14,6 +15,24 @@ typedef struct {
     int distance;
 } demo_products;
 
+char* item_to_string(item_t *match, double *total_price) {
+    if (match == NULL) {
+        return strdup("N/A");
+    }
+
+    *total_price += match->price;
+    amount_t *amount = match->amount;
+
+    char amount_buf[50] = { 0 };
+    if (amount)
+        sprintf(amount_buf, " (%.2lf %s)", amount->amount, get_unit_name(amount->unit_type));
+
+    char result_buf[255] = { 0 };
+    sprintf(result_buf, "%.2lf kr%s\n%s", match->price, amount_buf, match->name);
+
+    return strdup(result_buf);
+}
+
 int render_results_view(WINDOW *window, results_view_data_t *data) {
     table_t *table = init_table();
     table->padding_x = 1;
@@ -22,62 +41,90 @@ int render_results_view(WINDOW *window, results_view_data_t *data) {
     int store_count = (int)data->store_count;
 
     /* Add header rows */
-    char **header_row = calloc(store_count + 1, sizeof(char*));
+    char **header_row = calloc(store_count + 2, sizeof(char*));
+    header_row[1] = "Cheapest options";
     for (i = 0; i < store_count; i++)
-        header_row[i + 1] = data->stores[i]->name;
-    table_add_row_array(table, ROW_BOLD | ROW_ACENTER, store_count + 1, header_row);
+        header_row[i + 2] = data->stores[i]->name;
+    table_add_row_array(table, ROW_BOLD | ROW_ACENTER, store_count + 2, header_row);
     free(header_row);
 
     /* Create store total price array */
     double *store_totals = calloc(store_count, sizeof(double));
 
+    /* Find cheapest items overall */
+    char **shopping_list_arr = calloc(data->shopping_list->count, sizeof(char*));
+    dlist_fill_array(data->shopping_list, (void **) shopping_list_arr);
+
+    item_t *cheapest_items = different_items(data->stores, shopping_list_arr, store_count, data->shopping_list->count);
+    double cheapest_items_total = 0;
+
     /* Add product rows */
     dlist_node_t *node;
     for (i = 0, node = data->shopping_list->head; node != NULL; i++, node = node->next) {
         char* list_entry = node->data;
-        char** row_data = calloc(store_count + 1, sizeof(char*));
+        char** row_data = calloc(store_count + 2, sizeof(char*));
         row_data[0] = strdup(list_entry);
+        row_data[1] = item_to_string(&cheapest_items[i], &cheapest_items_total);
 
         for (j = 0; j < store_count; j++) {
             item_t *match = find_cheapest_match(data->stores[j], list_entry);
-
-            if (match == NULL) {
-                row_data[j + 1] = strdup("N/A");
-                continue;
-            }
-
-            store_totals[j] += match->price;
-            amount_t *amount = match->amount;
-
-            char amount_buf[50] = { 0 };
-            if (amount)
-                sprintf(amount_buf, " (%.2lf %s)", amount->amount, get_unit_name(amount->unit_type));
-
-            char result_buf[255] = { 0 };
-            sprintf(result_buf, "%.2lf kr%s\n%s", match->price, amount_buf, match->name);
-
-            row_data[j + 1] = strdup(result_buf);
+            row_data[j + 2] = item_to_string(match, &store_totals[j]);
         }
 
-        table_add_row_array(table, ROW_SIMPLE, store_count + 1, row_data);
+
+        table_add_row_array(table, ROW_SIMPLE, store_count + 2, row_data);
         free(row_data);
     }
 
     /* Add total row */
-    char **total_row = calloc(store_count + 1, sizeof(char*));
+    char **total_row = calloc(store_count + 2, sizeof(char*));
     total_row[0] = strdup("Total");
+    char cheapest_buf[50] = { 0 };
+    sprintf(cheapest_buf, "%.2lf kr", cheapest_items_total);;
+    total_row[1] = strdup(cheapest_buf);
     for (i = 0; i < store_count; i++) {
         char total_buf[50] = { 0 };
         sprintf(total_buf, "%.2lf kr", store_totals[i]);;
-        total_row[i + 1] = strdup(total_buf);
+        total_row[i + 2] = strdup(total_buf);
     }
-    table_add_row_array(table, ROW_BOLD, store_count + 1, total_row);
+    table_add_row_array(table, ROW_BOLD, store_count + 2, total_row);
     free(total_row);
 
     render_table(window, table);
+
+    if (data->home != NULL && !is_addr_empty(data->home)) {
+        wprintw(window, "\n\nFetching location information...");
+        wrefresh(window);
+
+        char **location_row = calloc(store_count + 2, sizeof(char*));
+        location_row[0] = "Distance";
+
+        for (i = 0; i < store_count; i++) {
+            location_t *places[] = { data->home, data->stores[i]->location };
+            int *arr = route_time(places, "car", data->here_api_key, 2, 0);
+            char location_buf[100];
+            sprintf(location_buf, "%d meters", arr[0]);
+            location_row[i + 2] = strdup(location_buf);
+        }
+
+        table_add_row_array(table, ROW_DEFAULT, store_count + 2, location_row);
+        wclear(window);
+        render_table(window, table);
+
+        free(location_row);
+    }
+
     wrefresh(window);
 
-    return 0;
+    menu_item_t menu_items[] = {
+            {"Edit shopping list"},
+            {"Return to main menu"}
+    };
+
+    wprintw(window, "\n\n");
+    int selected = render_menu(window, menu_items, sizeof(menu_items) / sizeof(menu_items[0]));
+
+    return selected;
 }
 
 /*

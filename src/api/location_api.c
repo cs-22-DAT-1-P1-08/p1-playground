@@ -115,7 +115,7 @@ int sum_of_arr(int arr[], size_t arr_len) {
 
 int *json_to_traveltime(json_object *jobj, location_t* places, size_t places_len, int output_duration) {
     int *travel_time = malloc(sizeof(int) * places_len);
-    char *output[] = {"lenght", "duration"};
+    char *output[] = {"length", "duration"};
 
     // Searches through the json both through elements and the 1st and only route in routes
     json_object *routes = json_object_object_get(jobj, "routes");
@@ -145,15 +145,15 @@ int *json_to_traveltime(json_object *jobj, location_t* places, size_t places_len
     return travel_time;
 }
 
-int *route_time(location_t *places, char *transportation, char *apikey, size_t places_len, int output_duration) {
+int *route_time(location_t *places[], char *transportation, char *apikey, size_t places_len, int output_duration) {
     char url[1000] = "https://router.hereapi.com/v8/routes?";
     add_if_api(url, apikey);
 
     for (int i = 0; i < places_len; ++i) {
         // calls are made so the missing information in all the location in places are filled
-        if (strncmp("home", places[i].place_name, 4)== 0) addr_to_geo(&places[i], apikey);
-        else store_to_geo(&places[i], apikey, places[0].lat, places[0].lng);
-        if (is_addr_empty(&places[i])) {
+        if (strncmp("home", places[i]->place_name, 4)== 0) addr_to_geo(places[i], apikey);
+        else store_to_geo(places[i], apikey, places[0]->lat, places[0]->lng);
+        if (is_addr_empty(places[i])) {
             printf("ERROR an address was entirely empty adter it should be filled");
             exit(EXIT_FAILURE);
         }
@@ -165,7 +165,7 @@ int *route_time(location_t *places, char *transportation, char *apikey, size_t p
             strcat(url, "via");
             strcat(url, "=");
         }
-        add_strings(url, 4, places[i].lat, ",", places[i].lng, "&");
+        add_strings(url, 4, places[i]->lat, ",", places[i]->lng, "&");
     }
 
     add_strings(url, 2,"return=travelSummary&transportMode=", transportation);
@@ -175,7 +175,7 @@ int *route_time(location_t *places, char *transportation, char *apikey, size_t p
     // Convets str to json_object
     json_object *jobj = json_tokener_parse(str);
 
-    int *time_arr = json_to_traveltime(jobj, places, places_len, 1);
+    int *time_arr = json_to_traveltime(jobj, *places, places_len, output_duration);
 
     time_arr[0] = 0;
     time_arr[0] = sum_of_arr(time_arr, places_len);

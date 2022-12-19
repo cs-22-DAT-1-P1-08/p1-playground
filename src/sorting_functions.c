@@ -16,7 +16,6 @@ char* to_lowercase(char* input_str) {
     return result;
 }
 
-
 //compares results to the new item found in the list
 int cmp_item_price(item_t *a, item_t *b) {
     // It's not possible to compare amount between pieces and other unit types
@@ -24,14 +23,17 @@ int cmp_item_price(item_t *a, item_t *b) {
         a->amount->unit_type == PIECES ^ b->amount->unit_type == PIECES)
         return get_item_price(a) > get_item_price(b);
 
+    // Compare same amount unit
     if (a->amount->unit_type == b->amount->unit_type)
         return (get_item_price(a) / a->amount->amount) >
                (get_item_price(b) / b->amount->amount);
 
+    // Convert liters to grams
     if (a->amount->unit_type == LITERS && b->amount->unit_type == GRAMS)
         return (get_item_price(a) / (a->amount->amount * 1000)) >
                (get_item_price(b) / b->amount->amount);
 
+    // Reverse
     if (a->amount->unit_type == GRAMS && b->amount->unit_type == LITERS)
         return (get_item_price(a) / a->amount->amount) >
                (get_item_price(b) / b->amount->amount * 1000);
@@ -59,7 +61,7 @@ dlist_t *split_input(char *search_term) {
 int cmp_user_friendliness(char *item, dlist_t *search_term){
     int results = 0;
     for (int i = 0; i < search_term->count; ++i) {
-        char * temp_term = (char*) (dlist_get_at(search_term, i)->data);
+        char *temp_term = (char*) (dlist_get_at(search_term, i)->data);
         if(strstr(item, temp_term)) {
             results++;
         }
@@ -70,21 +72,24 @@ int cmp_user_friendliness(char *item, dlist_t *search_term){
 
 item_t *find_cheapest_match(store_t *store, char *search_term) {
     char* lower_search_term = to_lowercase(search_term);
-    dlist_node_t *item_node = store->products->head;
     dlist_t *str_output = split_input(lower_search_term);
-    item_t *results = NULL;
+
     int search_hits = 1;
+
+    item_t *results = NULL;
+    dlist_node_t *item_node = store->products->head;
     while (item_node != NULL) {
+
         item_t *item = item_node->data;
         char* item_name = to_lowercase(item->name);
-        //if (strstr(item_name, lower_search_term) != NULL) {
+
         int temp_search_hits = cmp_user_friendliness(item_name, str_output);
         if (temp_search_hits >= search_hits) {
             search_hits = temp_search_hits;
-            // compares "results" with they knew item, which has the same string
-            if (results == NULL || cmp_item_price(results, item)) {
+
+            // compares "results" with the new item, which has the same string parts
+            if (results == NULL || cmp_item_price(results, item))
                 results = item;
-            }
         }
 
         free(item_name);

@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-char* text_input_field(WINDOW *window);
+
 int integer_input_field(WINDOW *window, int min, int max);
 
 void render_shopping_list(WINDOW *window, dlist_t* shopping_list) {

@@ -39,20 +39,26 @@ int temp_table() {
     return 0;
 }
 
+typedef enum view_states_t {
+    MAIN_VIEW,
+    SHOPPING_LIST_VIEW,
+    RESULTS_VIEW
+} view_states_t;
+
 int main() {
-    //return temp_table();
+    /* Retrieve here API key */
+    char* here_api_key = getenv("HERE_API_KEY");
+    if (here_api_key == NULL) {
+        fprintf(stderr, "Failed to retrieve HERE_API_KEY from environment variables.");
+        exit(EXIT_FAILURE);
+    }
+
+    /* Initialize stores */
     store_t *daglibrugsen = get_coop_store("Dagli'Brugsen", "1290", DB_DEALER_ID);
     store_t *coop365 = get_coop_store("Coop 365", "24165", COOP365_DEALER_ID);
-
     store_t *stores[] = { daglibrugsen, coop365 };
 
-    /*
-    char *search[] = {"FLOEDE OST", "FLOEDE IS","FISKEFILET", "MEDISTER", "SADNESS"};
-    char *a[] = {"100 GRAM", "1000 LITER", "500 GRAM", "200 GRAM", "1000 PIECES"};
-
-    print_item(stores, search, a, 2, 5);
-     */
-
+    /* Initialize curses */
     initscr();
     noecho();
 
@@ -60,89 +66,64 @@ int main() {
     init_color(1, (short)(77.0/255.0*1000), (short)(128.0/255.0*1000), (short)(247.0/255.0*1000));
     init_pair(1, 1, COLOR_BLACK);
 
-    enum MainViewMenuOptions selected;
-
-    WINDOW *main_view = create_main_view(stdscr);
-    render_main_view(main_view, &selected);
-    destroy_main_view(main_view);
-
-    if (selected == QUIT) {
-        return 0;
-    }
-
+    /* Initialize program state */
     dlist_t *shopping_list = calloc(1, sizeof(dlist_t));
-    render_shopping_list(stdscr, shopping_list);
+    view_states_t state = MAIN_VIEW;
 
-    results_view_data_t *result_data = calloc(1, sizeof(results_view_data_t));
-    result_data->shopping_list = shopping_list;
-    result_data->stores = stores;
-    result_data->store_count = sizeof(stores) / sizeof(stores[0]),
+    location_t *home = malloc(sizeof(location_t));
+    initialize_location(home);
 
-    render_results_view(stdscr, result_data);
+    /* Main loop & view switcher */
+    bool is_running = true;
+    while (is_running) {
+        switch (state) {
+            case SHOPPING_LIST_VIEW: {
+                render_shopping_list(stdscr, shopping_list);
+                state = RESULTS_VIEW;
+                break;
+            }
+            case RESULTS_VIEW: {
+                results_view_data_t *result_data = calloc(1, sizeof(results_view_data_t));
+                result_data->shopping_list = shopping_list;
+                result_data->stores = stores;
+                result_data->store_count = sizeof(stores) / sizeof(stores[0]),
+                        result_data->home = home;
+                result_data->here_api_key = here_api_key;
 
+                enum ResultViewMenuOptions result = render_results_view(stdscr, result_data);
+                if (result == RVM_SHOPPING_LIST) {
+                    state = SHOPPING_LIST_VIEW;
+                } else if (result == RVM_MAIN_SCREEN) {
+                    state = MAIN_VIEW;
+                }
+                break;
+            }
+            default:
+            case MAIN_VIEW: {
+                enum MainViewMenuOptions selected;
 
-    printw("Shopping list length: %d\n", shopping_list->count);
-    for (int i = 0; i < shopping_list->count; i++) {
-        printw(" - %s\n", dlist_get_at(shopping_list, i)->data);
+                WINDOW *main_view = create_main_view(stdscr);
+                render_main_view(main_view, &selected, home);
+                destroy_main_view(main_view);
+
+                if (selected == QUIT) is_running = false;
+
+                if (home && strlen(home->street) > 0) {
+                    strcpy(home->place_name, "home");
+                    addr_to_geo(home, here_api_key);
+
+                    fill_nearest_store(daglibrugsen, home);
+                    fill_nearest_store(coop365, home);
+                }
+
+                state = SHOPPING_LIST_VIEW;
+                break;
+            }
+        }
     }
-
-
 
     getch();
     endwin();
-
-    free_store(daglibrugsen);
-    free_store(coop365);
-    return 0;
-
-    printf("Started program...\n");
-    
-    // Lucas
-    /*store_t *daglibrugsen = get_coop_store("1290", DB_DEALER_ID);
-    store_t *coop365 = get_coop_store("24165", COOP365_DEALER_ID);
-    store_t *stores[] = {daglibrugsen,
-                         coop365};
-    // Grænseflade implementation
-    char *search_term[] = {"SMOERBAR", "SALT", "AGURK"};
-    char *amount[] = {"700 GRAM", "600 GRAM", "2 STK"};
-
-
-    //Output
-    print_item(stores, search_term, amount, 2, 3);*/
-    
-
-    //Retrieve HERE API key
-    char* here_api_key = getenv("HERE_API_KEY");
-    if (here_api_key == NULL) {
-        fprintf(stderr, "Failed to retrieve HERE_API_KEY from environment variables.");
-        exit(EXIT_FAILURE);
-    }
-
-    // Fill home location
-    location_t home;
-
-    initialize_location(&home);
-    strcpy(home.street, "Hadsundvej");
-    strcpy(home.houseNumber, "44");
-    strcpy(home.postalCode, "9000");
-    strcpy(home.place_name, "home");
-    addr_to_geo(&home, here_api_key);
-
-    // Fill store locations
-    fill_nearest_store(daglibrugsen, &home);
-    fill_nearest_store(coop365, &home);
-
-    // Get the route time
-    /*geocode places[] = {home, *coop365->location, *daglibrugsen->location};
-    int *arr = route_time(places, "car", here_api_key, 3);
-
-    for (int i = 0; i < 3; i++) {
-        printf("\n\n%d", arr[i]);
-    }*/
-
-    // Grænseflade implementation
-    printf("%s: %lf", find_cheapest_match(daglibrugsen, "TUBORG")->name,
-           find_cheapest_match(daglibrugsen, "TUBORG")->price);
 
     free_store(daglibrugsen);
     free_store(coop365);

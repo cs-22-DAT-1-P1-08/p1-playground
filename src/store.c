@@ -29,6 +29,7 @@ store_t link_offer_data(store_t* store) {
 
 store_t* get_coop_store(char* store_name, char* store_id, char* dealer_id) {
     store_t *store = calloc(1, sizeof(store_t));
+    store->location = NULL;
 
     /* Fill store name */
     store->name = calloc(strlen(store_name) + 1, sizeof(char));
@@ -48,9 +49,7 @@ store_t* get_coop_store(char* store_name, char* store_id, char* dealer_id) {
 }
 
 void fill_nearest_store(store_t *store, location_t *home) {
-    if (store->location == NULL) {
-        store->location = malloc(sizeof(location_t));
-    }
+    store->location = calloc(1, sizeof(location_t));
 
     initialize_location(store->location);
 
