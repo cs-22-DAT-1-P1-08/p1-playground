@@ -14,43 +14,65 @@ typedef struct {
     int distance;
 } demo_products;
 
-
-
 int render_results_view(WINDOW *window, results_view_data_t *data) {
     table_t *table = init_table();
+    table->padding_x = 1;
 
-    int size = (int)data->shopping_list->count;
+    int i, j;
     int store_count = (int)data->store_count;
 
-    wprintw(window, "omegalul");
-    wrefresh(window);
-    return 0;
+    /* Add header rows */
+    char **header_row = calloc(store_count + 1, sizeof(char*));
+    for (i = 0; i < store_count; i++)
+        header_row[i + 1] = data->stores[i]->name;
+    table_add_row_array(table, ROW_BOLD | ROW_ACENTER, store_count + 1, header_row);
+    free(header_row);
 
+    /* Create store total price array */
+    double *store_totals = calloc(store_count, sizeof(double));
+
+    /* Add product rows */
     dlist_node_t *node;
-    int i, j;
     for (i = 0, node = data->shopping_list->head; node != NULL; i++, node = node->next) {
         char* list_entry = node->data;
         char** row_data = calloc(store_count + 1, sizeof(char*));
         row_data[0] = strdup(list_entry);
 
-        for (j = 0; j < size * store_count; j++) {
-            item_t *match = find_cheapest_match(data->stores[i % store_count], list_entry);
+        for (j = 0; j < store_count; j++) {
+            item_t *match = find_cheapest_match(data->stores[j], list_entry);
 
-            if (match) {
-                amount_t *amount = match->amount;
+            if (match == NULL) {
+                row_data[j + 1] = strdup("N/A");
+                continue;
+            }
 
-                char amount_buf[50] = { 0 };
-                if (amount) sprintf(amount_buf, " (%.2lf %s)", amount->amount, get_unit_name(amount->unit_type));
+            store_totals[j] += match->price;
+            amount_t *amount = match->amount;
 
-                char result_buf[255] = { 0 };
-                sprintf(result_buf, "%.2lf kr%s\n%s", match->price, amount_buf, match->name);
+            char amount_buf[50] = { 0 };
+            if (amount)
+                sprintf(amount_buf, " (%.2lf %s)", amount->amount, get_unit_name(amount->unit_type));
 
-                row_data[j + 1] = strdup(result_buf);
-            } else row_data[j + 1] = strdup("N/A");
+            char result_buf[255] = { 0 };
+            sprintf(result_buf, "%.2lf kr%s\n%s", match->price, amount_buf, match->name);
+
+            row_data[j + 1] = strdup(result_buf);
         }
 
         table_add_row_array(table, ROW_SIMPLE, store_count + 1, row_data);
+        free(row_data);
     }
+
+    /* Add total row */
+    char **total_row = calloc(store_count + 1, sizeof(char*));
+    total_row[0] = strdup("Total");
+    for (i = 0; i < store_count; i++) {
+        char total_buf[50] = { 0 };
+        sprintf(total_buf, "%.2lf kr", store_totals[i]);;
+        total_row[i + 1] = strdup(total_buf);
+    }
+    table_add_row_array(table, ROW_BOLD, store_count + 1, total_row);
+    free(total_row);
 
     render_table(window, table);
     wrefresh(window);
