@@ -11,6 +11,12 @@ void render_table(WINDOW *window, table_t *table) {
     // Loop control variables, initialized when used.
     int i, j, k;
 
+    // Don't worry about these :)
+    dlist_node_t *row_node = NULL,
+                 *column_node = NULL;
+    table_row_t *temp_row = NULL,
+                *prev_row = NULL;
+
     // Save cursor position
     int top = getcury(window),
         left = getcurx(window);
@@ -21,34 +27,42 @@ void render_table(WINDOW *window, table_t *table) {
 
     // Print borders
     wmove(window, top, left);
-    for (i = 0; i < table->rows->count; i++) {
-        print_line_borders(window, table, table_width, '-', '+');
+
+    int simple_row, prev_simple_row = 0, print_simple;
+    for (i = 0, row_node = table->m_rows->head; i < table->m_rows->count; i++, row_node = row_node->next) {
+        temp_row = row_node->data;
+        simple_row = (temp_row->flags & ROW_SIMPLE) == ROW_SIMPLE;
+        print_simple = simple_row && prev_simple_row;
+
+        print_line_borders(window, table, table_width,print_simple ? ' ' : '-',print_simple ? '|' : '+');
 
         for (j = 0; j < table->m_row_heights[i] + table->padding_y * 2; j++)
             print_line_borders(window, table, table_width, ' ', '|');
 
-        if (i == table->rows->count - 1)
+        if (i == table->m_rows->count - 1)
             print_line_borders(window, table, table_width, '-', '+');
+
+        prev_simple_row = simple_row;
     }
 
     int bottom = getcury(window);
 
-
     // Print fields
-    dlist_node_t *row_node = NULL,
-                 *column_node = NULL;
-    dlist_t *temp_row = NULL;
     char *line, *rest, *temp_field = NULL;
 
     int offset_x, offset_y = 0;
     int temp_x, temp_y;
-    for (i = 0, row_node = table->rows->head; row_node != NULL; i++, row_node = row_node->next) {
+    for (i = 0, row_node = table->m_rows->head; row_node != NULL; i++, row_node = row_node->next) {
         temp_row = row_node->data;
+
+        if ((temp_row->flags & ROW_BOLD) == ROW_BOLD) {
+            attron(attron(A_BOLD));
+        }
 
         offset_x = 0;
         offset_y += 1;
 
-        for (j = 0, column_node = temp_row->head; column_node != NULL; j++, column_node = column_node->next) {
+        for (j = 0, column_node = temp_row->fields->head; column_node != NULL; j++, column_node = column_node->next) {
             offset_x += 1;
             temp_x = left + offset_x + table->padding_x;
             temp_y = top + offset_y + table->padding_y;
@@ -63,6 +77,10 @@ void render_table(WINDOW *window, table_t *table) {
             offset_x += table->m_column_widths[j] + table->padding_x * 2;
         }
 
+        if ((temp_row->flags & ROW_BOLD) == ROW_BOLD) {
+            attroff(attron(A_BOLD));
+        }
+
         offset_y += table->m_row_heights[i] + table->padding_y * 2;
     }
 
@@ -75,7 +93,7 @@ void render_table(WINDOW *window, table_t *table) {
 
 table_t* init_table() {
     table_t *table = calloc(1, sizeof(table_t));
-    table->rows = calloc(1, sizeof(dlist_t));
+    table->m_rows = calloc(1, sizeof(dlist_t));
 
     table->padding_x = 0;
     table->padding_y = 0;
@@ -83,16 +101,19 @@ table_t* init_table() {
     return table;
 }
 
-void table_add_row(table_t *table, int n, ...) {
+void table_add_row(table_t *table, int flags, int n, ...) {
     va_list ptr;
     va_start(ptr, n);
 
-    dlist_t *fields = calloc(1, sizeof(dlist_t));
+    table_row_t *row = calloc(1, sizeof(table_row_t));
+    row->fields = calloc(1, sizeof(dlist_t));
+
+    row->flags = flags;
 
     for (int i = 0; i < n; i++)
-        dlist_add(fields, va_arg(ptr, char*));
+        dlist_add(row->fields, va_arg(ptr, char*));
 
-    dlist_add(table->rows, fields);
+    dlist_add(table->m_rows, row);
 
     va_end(ptr);
 }
@@ -124,11 +145,11 @@ void print_line_borders(WINDOW *window, table_t *table, int table_width, char fi
 
 int find_table_width(table_t *table) {
     int table_width = 0;
-    for (dlist_node_t *row_node = table->rows->head; row_node != NULL; row_node = row_node->next) {
-        dlist_t *temp_row = row_node->data;
+    for (dlist_node_t *row_node = table->m_rows->head; row_node != NULL; row_node = row_node->next) {
+        table_row_t *temp_row = row_node->data;
 
-        if (temp_row->count > table_width)
-            table_width = (int)temp_row->count;
+        if (temp_row->fields->count > table_width)
+            table_width = (int)temp_row->fields->count;
     }
 
     return table_width;
@@ -136,17 +157,17 @@ int find_table_width(table_t *table) {
 
 void fill_row_column_dimensions(table_t *table, int table_width) {
     table->m_column_widths = calloc(table_width, sizeof(int));
-    table->m_row_heights = calloc(table->rows->count, sizeof(int));
+    table->m_row_heights = calloc(table->m_rows->count, sizeof(int));
 
     /* These local variables are initialized within the loops */
     char *temp_field;
     dlist_node_t *row_node, *column_node;
     int i, j;
 
-    for (i = 0, row_node = table->rows->head; row_node != NULL; i++, row_node = row_node->next) {
-        dlist_t *temp_row = row_node->data;
+    for (i = 0, row_node = table->m_rows->head; row_node != NULL; i++, row_node = row_node->next) {
+        table_row_t *temp_row = row_node->data;
 
-        for (j = 0, column_node = temp_row->head; column_node != NULL; j++, column_node = column_node->next) {
+        for (j = 0, column_node = temp_row->fields->head; column_node != NULL; j++, column_node = column_node->next) {
             temp_field = column_node->data;
 
             temp_field = strdup(column_node->data);
