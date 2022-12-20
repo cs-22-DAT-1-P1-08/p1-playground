@@ -1,3 +1,5 @@
+#include "../util/asprintf.h" /* NOTE: this has to be placed *before* '#include <stdio.h>' */
+
 #include "results_view.h"
 #include "../sorting_functions.h"
 #include "components/table.h"
@@ -27,10 +29,7 @@ char* item_to_string(item_t *match, double *total_price) {
     if (amount)
         sprintf(amount_buf, " (%.2lf %s)", amount->amount, get_unit_name(amount->unit_type));
 
-    char result_buf[255] = { 0 };
-    sprintf(result_buf, "%.2lf kr%s\n%s", match->price, amount_buf, match->name);
-
-    return strdup(result_buf);
+    return qasprintf( "%.2lf kr%s\n%s", match->price, amount_buf, match->name);
 }
 
 int render_results_view(WINDOW *window, results_view_data_t *data) {
@@ -42,9 +41,11 @@ int render_results_view(WINDOW *window, results_view_data_t *data) {
 
     /* Add header rows */
     char **header_row = calloc(store_count + 2, sizeof(char*));
-    header_row[1] = "Cheapest options";
+
+    header_row[1] = strdup("Cheapest options");
     for (i = 0; i < store_count; i++)
         header_row[i + 2] = data->stores[i]->name;
+
     table_add_row_array(table, ROW_BOLD | ROW_ACENTER, store_count + 2, header_row);
     free(header_row);
 
@@ -63,6 +64,7 @@ int render_results_view(WINDOW *window, results_view_data_t *data) {
     for (i = 0, node = data->shopping_list->head; node != NULL; i++, node = node->next) {
         char* list_entry = node->data;
         char** row_data = calloc(store_count + 2, sizeof(char*));
+
         row_data[0] = strdup(list_entry);
         row_data[1] = item_to_string(&cheapest_items[i], &cheapest_items_total);
 
@@ -79,14 +81,12 @@ int render_results_view(WINDOW *window, results_view_data_t *data) {
     /* Add total row */
     char **total_row = calloc(store_count + 2, sizeof(char*));
     total_row[0] = strdup("Total");
-    char cheapest_buf[50] = { 0 };
-    sprintf(cheapest_buf, "%.2lf kr", cheapest_items_total);;
-    total_row[1] = strdup(cheapest_buf);
-    for (i = 0; i < store_count; i++) {
-        char total_buf[50] = { 0 };
-        sprintf(total_buf, "%.2lf kr", store_totals[i]);;
-        total_row[i + 2] = strdup(total_buf);
-    }
+
+    asprintf(&total_row[1], "%.2lf kr", cheapest_items_total);
+
+    for (i = 0; i < store_count; i++)
+        asprintf(&total_row[i + 2], "%.2lf kr", store_totals[i]);
+
     table_add_row_array(table, ROW_BOLD, store_count + 2, total_row);
     free(total_row);
 
@@ -102,9 +102,8 @@ int render_results_view(WINDOW *window, results_view_data_t *data) {
         for (i = 0; i < store_count; i++) {
             location_t *places[] = { data->home, data->stores[i]->location };
             int *arr = route_time(places, "car", data->here_api_key, 2, 0);
-            char location_buf[100];
-            sprintf(location_buf, "%d meters", arr[0]);
-            location_row[i + 2] = strdup(location_buf);
+
+            asprintf(&location_row[i + 2], "%d meters", arr[0]);
         }
 
         table_add_row_array(table, ROW_DEFAULT, store_count + 2, location_row);
