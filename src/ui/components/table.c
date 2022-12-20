@@ -161,7 +161,7 @@ void free_table(table_t *table) {
     if (table->title != NULL)
         free(table->title);
 
-    // TODO: Determine how to free both rows, columns and optionally fields
+    // TODO: Determine how to free fields only if heap allocated
     //if (table->rows != NULL)
     //    dlist_free_all(table->rows, )
 
