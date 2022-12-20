@@ -137,6 +137,22 @@ void table_add_row_array(table_t *table, int flags, int n, char* arr[]) {
     dlist_add(table->m_rows, row);
 }
 
+table_row_t* table_add_empty_row(table_t *table, int flags, int n) {
+    table_row_t *row = calloc(1, sizeof(table_row_t));
+    row->fields = calloc(1, sizeof(dlist_t));
+
+    row->flags = flags;
+
+    for (int i = 0; i < n; i++)
+        dlist_add(row->fields, "");
+
+    dlist_add(table->m_rows, row);
+    return row;
+}
+
+void table_row_update_field(table_row_t *row, int field_index, char* new_value) {
+    dlist_get_at(row->fields, field_index)->data = new_value;
+}
 
 void free_table(table_t *table) {
     if (table == NULL)

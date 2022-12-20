@@ -29,6 +29,8 @@ void free_table(table_t *table);
 
 void table_add_row(table_t *table, int flags, int n, ...);
 void table_add_row_array(table_t *table, int flags, int n, char* arr[]);
+table_row_t* table_add_empty_row(table_t *table, int flags, int n);
+void table_row_update_field(table_row_t *row, int field_index, char* new_value);
 
 void render_table(WINDOW *window, table_t *table);
 
