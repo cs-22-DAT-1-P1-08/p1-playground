@@ -91,7 +91,7 @@ int render_results_view(WINDOW *window, results_view_data_t *data) {
         wrefresh(window);
 
         table_row_t *location_row = table_add_empty_row(table, ROW_DEFAULT, TABLE_WIDTH);
-        table_row_update_field(location_row, QUERY_COLUMN, "Travel time (car)");
+        table_row_update_field(location_row, QUERY_COLUMN, "Travel time (car)\nOne way (Round-trip)");
 
         dlist_t *all_places_list = calloc(1, sizeof(dlist_t));
         dlist_add(all_places_list, data->home);
@@ -99,17 +99,19 @@ int render_results_view(WINDOW *window, results_view_data_t *data) {
         for (i = 0; i < store_count; i++) {
             dlist_add(all_places_list, data->stores[i]->location);
 
-            location_t *places[] = { data->home, data->stores[i]->location };
-            int *arr = route_time(places, "car", data->here_api_key, 2, 1);
+            location_t *places[] = { data->home, data->stores[i]->location, data->home };
+            int *arr = route_time(places, "car", data->here_api_key, 3, 1);
 
-            table_row_update_field(location_row, i + OFFSET_LEFT, qasprintf("%.2lf minutes", arr[0] / 60.0));
+            table_row_update_field(location_row, i + OFFSET_LEFT, qasprintf("%.2lf minutes\n(%.2lf minutes)", (arr[0]-arr[2]) / 60.0, arr[0] / 60.0));
         }
+        dlist_add(all_places_list, data->home);
 
         location_t **all_places = calloc(all_places_list->count, sizeof(location_t*));
         dlist_fill_array(all_places_list, (void **) all_places);
 
-        int *arr2 = route_time(all_places, "car", data->here_api_key, all_places_list->count, 1);
-        table_row_update_field(location_row, CHEAPEST_COLUMN, qasprintf("%.2lf minutes", arr2[0] / 60.0));
+        int places_n = (int)all_places_list->count;
+        int *arr2 = route_time(all_places, "car", data->here_api_key, places_n, 1);
+        table_row_update_field(location_row, CHEAPEST_COLUMN, qasprintf("%.2lf minutes\n(%.2lf minutes)", (arr2[0] - arr2[places_n - 1]) / 60.0, arr2[0] / 60.0));
 
         wclear(window);
         render_table(window, table);
