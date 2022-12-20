@@ -113,11 +113,11 @@ item_t *compare_item(store_t *store[], char *search_term, size_t length_of_store
     return cheapest_item;
 }
 
-item_t *different_items(store_t *store[], char *search_term[], size_t length_of_store, size_t length_of_input) {
-    item_t *products = malloc(length_of_input * sizeof(item_t));
+item_t **different_items(store_t *store[], char *search_term[], size_t length_of_store, size_t length_of_input) {
+    item_t **products = malloc(length_of_input * sizeof(item_t*));
     for (int j = 0; j < length_of_input; ++j) {
         item_t *cheapest_specific_item = compare_item(store, search_term[j], length_of_store);
-        products[j] = *cheapest_specific_item;
+        products[j] = cheapest_specific_item;
     }
     return products;
 }

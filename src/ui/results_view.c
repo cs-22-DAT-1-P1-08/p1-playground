@@ -22,14 +22,18 @@ char* item_to_string(item_t *match, double *total_price) {
         return strdup("N/A");
     }
 
-    *total_price += match->price;
+    *total_price += get_item_price(match);
     amount_t *amount = match->amount;
 
     char amount_buf[50] = { 0 };
     if (amount)
         sprintf(amount_buf, " (%.2lf %s)", amount->amount, get_unit_name(amount->unit_type));
 
-    return qasprintf( "%.2lf kr%s\n%s", match->price, amount_buf, match->name);
+    char offer_buf[50] = {0};
+    if (match->offer != NULL)
+        sprintf(offer_buf, " (save %.2lf kr)", match->price - get_item_price(match));
+
+    return qasprintf( "%.2lf kr%s%s\n%s", get_item_price(match), offer_buf, amount_buf, match->name);
 }
 
 int render_results_view(WINDOW *window, results_view_data_t *data) {
@@ -43,7 +47,7 @@ int render_results_view(WINDOW *window, results_view_data_t *data) {
     char **shopping_list_arr = calloc(data->shopping_list->count, sizeof(char*));
     dlist_fill_array(data->shopping_list, (void **) shopping_list_arr);
 
-    item_t *cheapest_items = different_items(data->stores, shopping_list_arr, store_count, data->shopping_list->count);
+    item_t **cheapest_items = different_items(data->stores, shopping_list_arr, store_count, data->shopping_list->count);
     double cheapest_items_total = 0;
 
     const int QUERY_COLUMN = 0;
@@ -68,7 +72,7 @@ int render_results_view(WINDOW *window, results_view_data_t *data) {
 
         table_row_t *row = table_add_empty_row(table, ROW_SIMPLE, store_count + OFFSET_LEFT);
         table_row_update_field(row, QUERY_COLUMN, list_entry);
-        table_row_update_field(row, CHEAPEST_COLUMN, item_to_string(&cheapest_items[i], &cheapest_items_total));
+        table_row_update_field(row, CHEAPEST_COLUMN, item_to_string(cheapest_items[i], &cheapest_items_total));
 
         for (j = 0; j < store_count; j++) {
             item_t *match = find_cheapest_match(data->stores[j], list_entry);

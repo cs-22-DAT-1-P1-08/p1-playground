@@ -18,7 +18,7 @@ item_t *find_cheapest_match(store_t *store, char *search_term);
 
 item_t *compare_item(store_t *store[], char *search_term, size_t length_of_store);
 
-item_t *different_items(store_t *store[], char *search_term[], size_t length_of_store, size_t length_of_input);
+item_t **different_items(store_t *store[], char *search_term[], size_t length_of_store, size_t length_of_input);
 
 int cmp_amount(item_t item, amount_t UI);
 
