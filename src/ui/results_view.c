@@ -91,14 +91,25 @@ int render_results_view(WINDOW *window, results_view_data_t *data) {
         wrefresh(window);
 
         table_row_t *location_row = table_add_empty_row(table, ROW_DEFAULT, TABLE_WIDTH);
-        table_row_update_field(location_row, QUERY_COLUMN, "Distance");
+        table_row_update_field(location_row, QUERY_COLUMN, "Travel time (car)");
+
+        dlist_t *all_places_list = calloc(1, sizeof(dlist_t));
+        dlist_add(all_places_list, data->home);
 
         for (i = 0; i < store_count; i++) {
-            location_t *places[] = { data->home, data->stores[i]->location };
-            int *arr = route_time(places, "car", data->here_api_key, 2, 0);
+            dlist_add(all_places_list, data->stores[i]->location);
 
-            table_row_update_field(location_row, i + OFFSET_LEFT, qasprintf("%d meters", arr[0]));
+            location_t *places[] = { data->home, data->stores[i]->location };
+            int *arr = route_time(places, "car", data->here_api_key, 2, 1);
+
+            table_row_update_field(location_row, i + OFFSET_LEFT, qasprintf("%.2lf minutes", arr[0] / 60.0));
         }
+
+        location_t **all_places = calloc(all_places_list->count, sizeof(location_t*));
+        dlist_fill_array(all_places_list, (void **) all_places);
+
+        int *arr2 = route_time(all_places, "car", data->here_api_key, all_places_list->count, 1);
+        table_row_update_field(location_row, CHEAPEST_COLUMN, qasprintf("%.2lf minutes", arr2[0] / 60.0));
 
         wclear(window);
         render_table(window, table);
