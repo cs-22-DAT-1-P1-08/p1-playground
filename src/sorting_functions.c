@@ -133,7 +133,7 @@ int cmp_amount(item_t item, amount_t UI) {
         return n;
 }
 
-void print_item(store_t *store[], char *search_term[], char *amounts[], size_t length_of_store, size_t input_of_product) {
+void print_matches_debug(store_t *store[], char *search_term[], char *amounts[], size_t length_of_store, size_t input_of_product) {
     item_t *products =  different_items(store, search_term, length_of_store, input_of_product);
     printf("Your cheapest match is the following:\n");
     for(int i = 0; i < input_of_product; i++) {

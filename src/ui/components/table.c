@@ -14,8 +14,7 @@ void render_table(WINDOW *window, table_t *table) {
     // Don't worry about these :)
     dlist_node_t *row_node = NULL,
                  *column_node = NULL;
-    table_row_t *temp_row = NULL,
-                *prev_row = NULL;
+    table_row_t *temp_row = NULL;
 
     // Save cursor position
     int top = getcury(window),
@@ -203,8 +202,6 @@ void fill_row_column_dimensions(table_t *table, int table_width) {
         table_row_t *temp_row = row_node->data;
 
         for (j = 0, column_node = temp_row->fields->head; column_node != NULL; j++, column_node = column_node->next) {
-            temp_field = column_node->data;
-
             temp_field = strdup(column_node->data);
             char *line, *rest = temp_field;
 

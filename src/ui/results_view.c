@@ -8,15 +8,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-//a struct for fake data
-typedef struct {
-    char product_name[30];
-    char store[20];
-    char amount[10];
-    double price;
-    int distance;
-} demo_products;
-
 char* item_to_string(item_t *match, double *total_price) {
     if (match == NULL) {
         return strdup("N/A");

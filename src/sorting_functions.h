@@ -22,7 +22,7 @@ item_t **different_items(store_t *store[], char *search_term[], size_t length_of
 
 int cmp_amount(item_t item, amount_t UI);
 
-void print_item(store_t *store[], char *search_term[], char *amounts[], size_t length_of_store, size_t input_of_product);
+void print_matches_debug(store_t *store[], char *search_term[], char *amounts[], size_t length_of_store, size_t input_of_product);
 
 
 #ifndef P1_PLAYGROUND_SORTING_FUNCTIONS_H

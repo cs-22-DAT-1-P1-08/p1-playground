@@ -1,6 +1,5 @@
 #include "shopping_list_view.h"
 #include "components/arrow_menu.h"
-#include "../util/dlist.h"
 #include <stdlib.h>
 #include <string.h>
 

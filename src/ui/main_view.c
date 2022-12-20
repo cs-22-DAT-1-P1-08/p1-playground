@@ -2,7 +2,6 @@
 #include "components/arrow_menu.h"
 #include "shopping_list_view.h"
 #include <curses.h>
-#include <stdlib.h>
 #include <string.h>
 
 WINDOW* create_main_view(WINDOW *parent) {

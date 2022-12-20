@@ -5,11 +5,6 @@
 #include "api/tjek_api.h"
 #include "api/location_api.h"
 
-enum StoreType {
-    COOP,
-    SALLING
-};
-
 typedef struct {
     char* name;
     location_t* location;
