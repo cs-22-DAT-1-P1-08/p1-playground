@@ -77,7 +77,10 @@ int main() {
                 render_main_view(main_view, &selected, home);
                 destroy_main_view(main_view);
 
-                if (selected == QUIT) is_running = false;
+                if (selected == QUIT) {
+                    is_running = false;
+                    break;
+                }
 
                 if (home && strlen(home->street) > 0) {
                     strcpy(home->place_name, "home");
@@ -93,7 +96,6 @@ int main() {
         }
     }
 
-    getch();
     endwin();
 
     free_store(daglibrugsen);
