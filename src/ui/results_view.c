@@ -110,12 +110,14 @@ int render_results_view(WINDOW *window, results_view_data_t *data) {
         }
         dlist_add(all_places_list, data->home);
 
-        location_t **all_places = calloc(all_places_list->count, sizeof(location_t*));
-        dlist_fill_array(all_places_list, (void **) all_places);
-
         int places_n = (int)all_places_list->count;
-        int *arr2 = route_time(all_places, "car", data->here_api_key, places_n, 1);
-        table_row_update_field(location_row, CHEAPEST_COLUMN, qasprintf("%.2lf minutes\n(%.2lf minutes)", (arr2[0] - arr2[places_n - 1]) / 60.0, arr2[0] / 60.0));
+        location_t **all_places = calloc(places_n, sizeof(location_t*));
+        dlist_fill_array(all_places_list, (void **) all_places);
+        dlist_free(all_places_list);
+
+        int *arr = route_time(all_places, "car", data->here_api_key, places_n, 1);
+        table_row_update_field(location_row, CHEAPEST_COLUMN, qasprintf("%.2lf minutes\n(%.2lf minutes)", (arr[0] - arr[places_n - 1]) / 60.0, arr[0] / 60.0));
+        free(all_places);
 
         wclear(window);
         render_table(window, table);
@@ -131,6 +133,7 @@ int render_results_view(WINDOW *window, results_view_data_t *data) {
     wprintw(window, "\n\n");
     int selected = render_menu(window, menu_items, sizeof(menu_items) / sizeof(menu_items[0]));
 
+    free_table(table);
     return selected;
 }
 
