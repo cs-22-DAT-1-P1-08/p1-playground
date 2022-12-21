@@ -28,7 +28,9 @@ int main(void) {
     strcpy(locations[2].place_name, "coop365");
 
     locations[3] = locations[0];
-    int *route_times = route_time(locations, transport_mode, here_api_key, 4);
+
+    location_t *location_p[4] = { &locations[0], &locations[1], &locations[2], &locations[3] };
+    int *route_times = route_time(location_p, transport_mode, here_api_key, 4, 1);
 
     int x, y;
 

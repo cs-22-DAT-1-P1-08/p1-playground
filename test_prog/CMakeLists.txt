@@ -14,6 +14,7 @@ set(SOURCES_TEST
         ${PROJECT_SOURCE_DIR}/src/ui/results_view.c
         ${PROJECT_SOURCE_DIR}/src/ui/shopping_list_view.c
         ${PROJECT_SOURCE_DIR}/src/ui/components/arrow_menu.c
+        ${PROJECT_SOURCE_DIR}/src/ui/components/table.c
         )
 target_sources(test_item PRIVATE ${SOURCES_TEST})
 target_sources(test_location PRIVATE ${SOURCES_TEST})
