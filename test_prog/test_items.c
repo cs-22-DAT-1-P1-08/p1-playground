@@ -108,7 +108,7 @@ store_t* get_store_time_test(char* store_name, char* store_id, char* dealer_id) 
 
     /* Fill assortment data from Coop API */
     begin = clock();
-    store->products = coop_get_items("1290");
+    store->products = coop_get_items(store_id);
     end = clock();
 
     time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
@@ -116,7 +116,7 @@ store_t* get_store_time_test(char* store_name, char* store_id, char* dealer_id) 
 
     /* Fill offer data from Tjek API */
     begin = clock();
-    store->catalog_info = get_catalog_info(DB_DEALER_ID);
+    store->catalog_info = get_catalog_info(dealer_id);
     store->offers = get_catalog_offers(store->catalog_info);
     end = clock();
 
